@@ -1,4 +1,3 @@
-# CHAD-NEOVIM
 # Minha Configuração Neovim
 
 Esta é uma configuração personalizada para o Neovim, organizada de forma modular e gerenciada pelo plugin manager [lazy.nvim](https://github.com/folke/lazy.nvim).
@@ -68,16 +67,16 @@ mv ~/.config/nvim ~/.config/nvim.bak
 ```
 
 2.  **Clone este repositório:**
-    ```bash
+```bash
 git clone <URL_DO_SEU_REPOSITORIO> ~/.config/nvim
 ```
-    *Substitua `<URL_DO_SEU_REPOSITORIO>` pela URL do seu repositório Git.*
+*Substitua `<URL_DO_SEU_REPOSITORIO>` pela URL do seu repositório Git.*
 
 3.  **Inicie o Neovim:**
     ```bash
 nvim
 ```
-    O `lazy.nvim` será instalado automaticamente na primeira vez que você abrir o Neovim.
+O `lazy.nvim` será instalado automaticamente na primeira vez que você abrir o Neovim.
 
 ---
 
@@ -85,7 +84,7 @@ nvim
 ### 🪟 Windows
 
 1.  **Abra o PowerShell** e faça backup da sua configuração atual (se houver):
-    ```powershell
+```powershell
 move $env:LOCALAPPDATA\nvim $env:LOCALAPPDATA\nvim.bak
 ```
 
@@ -93,13 +92,13 @@ move $env:LOCALAPPDATA\nvim $env:LOCALAPPDATA\nvim.bak
     ```powershell
 git clone <URL_DO_SEU_REPOSITORIO> $env:LOCALAPPDATA\nvim
 ```
-    *Substitua `<URL_DO_SEU_REPOSITORIO>` pela URL do seu repositório Git.*
+*Substitua `<URL_DO_SEU_REPOSITORIO>` pela URL do seu repositório Git.*
 
 3.  **Inicie o Neovim:**
-    ```powershell
+```powershell
 nvim
 ```
-    O `lazy.nvim` será instalado e configurado automaticamente.
+O `lazy.nvim` será instalado e configurado automaticamente.
 
 ## Pós-instalação
 
@@ -116,8 +115,8 @@ Use o comando `:checkhealth` para verificar se há algum problema com a instala�
 
 3.  **COC (Conquer of Completion):**
 O `coc.nvim` pode precisar instalar suas próprias extensões. Use o comando `:CocInstall` para instalar servidores de linguagem, por exemplo:
-    ```
+```
 :CocInstall coc-tsserver coc-pyright coc-json
 ```
 
-Sua configuração está pronta!%   
+Sua configuração está pronta!
