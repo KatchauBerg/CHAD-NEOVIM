@@ -2,7 +2,11 @@ return {
   "folke/which-key.nvim",
   -- cond = not vim.g.vscode,
   event = "VeryLazy",
-  opts = {},
+  opts = {
+    defaults = {
+      ["<leader>r"] = { name = "+relative numbers" },
+    },
+  },
   keys = {
     {
       "<leader>?",

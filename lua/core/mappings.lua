@@ -29,37 +29,15 @@ map("n", "<leader>fm", function()
   require("conform").format()
 end)
 
-
-local function check_back_space()
-  local col = vim.fn.col(".") - 1
-  return col == 0 or vim.fn.getline("."):sub(col, col) == " "
+-- Toggle function for relative numbers
+function _G.toggle_relative_numbers()
+  vim.o.relativenumber = not vim.o.relativenumber
+  vim.o.number = not vim.o.number
 end
 
--- Mapeamento Principal para Snippets e Navegação
-map("i", "<Tab>", function()
-  if vim.fn["coc#pum#visible"]() == 1 then
-    -- Se o menu estiver visível, use Tab para selecionar a próxima sugestão
-    return vim.fn["coc#_select_confirm"]()
-  elseif vim.fn["coc#expandable"]() == 1 then
-    -- Se houver um Snippet, use Tab para expandi-lo
-    return vim.fn["coc#expand"]()
-  elseif check_back_space() then
-    -- Se estiver no início da linha ou após um espaço, insere um Tab normal (indentação)
-    return "<Tab>"
-  else
-    -- Caso contrário, insere um Tab normal (indentação)
-    return vim.fn["coc#refresh"]()
-  end
-end, { expr = true, silent = true, desc = "CoC: Navegação/Confirmação/Snippet" })
+-- Mapping to toggle relative numbers
+map("n", "<leader>rn", ":lua _G.toggle_relative_numbers()<CR>", { desc = "Toggle Relative Numbers" })
 
--- Navegação no menu do CoC (usando Shift+Tab para Voltar)
-map("i", "<S-Tab>", function()
-  if vim.fn["coc#pum#visible"]() == 1 then
-    return vim.fn["coc#_select_prev"]()
-  else
-    return "<S-Tab>"
-  end
-end, { expr = true, silent = true, desc = "CoC: Sugestão Anterior" })
 
 -- Mapeamento para confirmar a sugestão com Enter (CR)
 -- Isso é necessário para que o CoC saiba o que fazer com a tecla Enter

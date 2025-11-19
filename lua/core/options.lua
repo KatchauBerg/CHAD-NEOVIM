@@ -20,6 +20,7 @@ o.smartcase = true
 o.mouse = "a"
 
 o.number = true
+o.relativenumber = true
 
 o.signcolumn = "yes"
 o.splitbelow = true

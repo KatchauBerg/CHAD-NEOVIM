@@ -43,7 +43,7 @@ return {
     }
 
     vim.lsp.config("*", { capabilities = capabilities })
-    local servers = { "html", "cssls" , 'lua_ls', 'pylsp', 'tsserver' }
+    local servers = { "html", "cssls" , 'lua_ls', 'pylsp' }
 
     vim.lsp.enable(servers)
   end,

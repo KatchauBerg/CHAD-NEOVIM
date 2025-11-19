@@ -11,12 +11,13 @@ autocmd('VimEnter', {
   group = 'ThemeHandler',
   pattern = '*',
   callback = function()
-    -- Carrega o tema salvo
-    local status, theme = pcall(require, 'colorscheme')
+    local theme_file = vim.fn.stdpath('config') .. '/colorscheme.lua'
+    -- Usamos dofile para carregar o arquivo com caminho absoluto
+    local status, theme = pcall(dofile, theme_file)
     if status and theme then
       vim.cmd.colorscheme(theme)
     else
-      -- Fallback se o arquivo não existir ou estiver vazio
+      -- Fallback se o arquivo não existir ou falhar ao carregar
       vim.cmd.colorscheme('catppuccin')
     end
   end,

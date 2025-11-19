@@ -1,42 +1,16 @@
 {
-  // --- 1. CONFIGURAÇÃO DE FORMATAÇÃO (Geral e por Arquivo) ---
-  // Habilita a formatação ao salvar
-  "coc.preferences.formatOnSave": true,
-  // Configurações por tipo de arquivo (Override)
-  "[typescript]": {
-    "formatOnSave": true
-  },
-  "[typescriptreact]": {
-    "formatOnSave": true
-  },
-  "[javascript]": {
-    "formatOnSave": true
-  },
-  "[javascriptreact]": {
-    "formatOnSave": true
-  },
-  "[python]": {
-    "formatOnSave": true
-  },
   "eslint.enable": true,
-  "eslint.autoFixOnSave": true, // Ativa a correção automática do linter ao salvar
-  "eslint.nodePath": "/home/dev2/.nvm/versions/node/v22.15.0/bin",
   "eslint.validate": [
     "javascript",
     "javascriptreact",
     "typescript",
     "typescriptreact"
   ],
-  "eslint.options": {
-    "resolvePluginsRelativeTo": "./node_modules/ts-standard/node_modules",
-    "overrideConfigFile": "./node_modules/ts-standard/eslintrc.json"
-  },
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
   "suggest.confirmKeys": [
-    "<CR>",
-    "<tab>"
+    "<CR>"
   ],
   "suggest.acceptSuggestionOnCommitCharacter": false
 }
