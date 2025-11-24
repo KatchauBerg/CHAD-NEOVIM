@@ -1,7 +1,7 @@
 return {
   'neoclide/coc.nvim',
   branch = 'release',
-  build = 'npm ci',
+  build = 'npm install',
   lazy = false,
   config = function()
       -- a config do coc não será executada no vscode
