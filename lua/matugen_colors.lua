@@ -3,27 +3,27 @@ return {
 
   -- Antes era 'surface' (Preto forte). 
   -- Agora 'surface_container' é um cinza/azulado suave (depende da foto).
-  background = "#241e23",
+  background = "#1e1f25",
 
   -- Se quiser ainda mais claro (tipo um cinza médio), use:
-  -- background = "#2e282d",
+  -- background = "#292a2f",
 
   -- Texto: Usar 'on_surface_variant' deixa o branco menos estourado (mais suave)
-  foreground = "#ebdfe6", 
+  foreground = "#e3e2e9", 
 
   -- Cursorline: Precisa ser um pouco diferente do background para destacar
-  cursorline = "#2e282d",
+  cursorline = "#292a2f",
 
-  comment    = "#998d96",
+  comment    = "#8f909a",
 
   -- Destaques (Mantém iguais)
-  primary    = "#eeb4e9",
-  secondary  = "#d9bfd4",
-  tertiary   = "#f6b8aa",
+  primary    = "#b4c4ff",
+  secondary  = "#c1c5dd",
+  tertiary   = "#e2bbdb",
 
   -- UI
-  selection  = "#393338", -- Seleção mais visível
-  border     = "#4d444b",
+  selection  = "#34343a", -- Seleção mais visível
+  border     = "#45464f",
   error      = "#ffb4ab",
-  warn       = "#f6b8aa",
+  warn       = "#e2bbdb",
 }
