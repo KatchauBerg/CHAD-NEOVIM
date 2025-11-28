@@ -1,29 +1,19 @@
 return {
   -- === MUDANÇAS PARA FICAR PASTEL ===
+  background = "#241e23",
+  foreground = "#ebdfe6", 
 
-  -- Antes era 'surface' (Preto forte). 
-  -- Agora 'surface_container' é um cinza/azulado suave (depende da foto).
-  background = "#1e1f25",
-
-  -- Se quiser ainda mais claro (tipo um cinza médio), use:
-  -- background = "#292a2f",
-
-  -- Texto: Usar 'on_surface_variant' deixa o branco menos estourado (mais suave)
-  foreground = "#e3e2e9", 
-
-  -- Cursorline: Precisa ser um pouco diferente do background para destacar
-  cursorline = "#292a2f",
-
-  comment    = "#8f909a",
+  cursorline = "#2e282d",
+  comment    = "#998d96",
 
   -- Destaques (Mantém iguais)
-  primary    = "#b4c4ff",
-  secondary  = "#c1c5dd",
-  tertiary   = "#e2bbdb",
+  primary    = "#eeb4e9",
+  secondary  = "#d9bfd4",
+  tertiary   = "#f6b8aa",
 
   -- UI
-  selection  = "#34343a", -- Seleção mais visível
-  border     = "#45464f",
+  selection  = "#393338", -- Seleção mais visível
+  border     = "#4d444b",
   error      = "#ffb4ab",
-  warn       = "#e2bbdb",
+  warn       = "#f6b8aa",
 }
