@@ -1,1 +1,1 @@
-return "matugen"
+return "catppuccin-mocha"

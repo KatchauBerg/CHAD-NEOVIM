@@ -1,0 +1,5 @@
+local result = vim.fn.system({ "tmux", "show", "-Apv", "allow-passthrough" })
+print("Result: '" .. result .. "'")
+print("Length: " .. #result)
+print("Last 3 chars: '" .. result:sub(-3) .. "'")
+print("Is Match? " .. tostring(result:sub(-3) == "on\n"))
