@@ -5,26 +5,7 @@ local autocmd = vim.api.nvim_create_autocmd
 local theme_group = augroup('ThemeHandler', { clear = true })
 local matugen_group = augroup('MatugenReload', { clear = true })
 
--- 1. Carrega o esquema de cores salvo ao entrar no Neovim
-autocmd('VimEnter', {
-  group = theme_group,
-  pattern = '*',
-  callback = function()
-    local theme_file = vim.fn.stdpath('config') .. '/colorscheme.lua'
-    -- Usamos dofile para carregar o arquivo com caminho absoluto
-    local status, theme = pcall(dofile, theme_file)
-    if status and theme then
-      -- Tenta carregar o tema salvo. Se falhar (ex: erro no matugen), cai no catch
-      local ok = pcall(vim.cmd.colorscheme, theme)
-      if not ok then
-        vim.cmd.colorscheme('catppuccin')
-      end
-    else
-      -- Fallback se o arquivo de save não existir
-      vim.cmd.colorscheme('catppuccin')
-    end
-  end,
-})
+
 
 -- 2. Salva o nome do esquema de cores sempre que ele for alterado
 autocmd('ColorScheme', {

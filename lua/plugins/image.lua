@@ -2,7 +2,7 @@ return {
   {
     "3rd/image.nvim",
     dependencies = {
-      "leafo/magick", -- ESTE é o repositório correto
+      "leafo/magick",
     },
     opts = {
       backend = "kitty", -- Força o uso do protocolo Kitty

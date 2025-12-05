@@ -1,19 +1,19 @@
 return {
   -- === MUDANÇAS PARA FICAR PASTEL ===
-  background = "#241e23",
-  foreground = "#ebdfe6", 
+  background = "#1e1f25",
+  foreground = "#e3e2e9", 
 
-  cursorline = "#2e282d",
-  comment    = "#998d96",
+  cursorline = "#292a2f",
+  comment    = "#8f909a",
 
   -- Destaques (Mantém iguais)
-  primary    = "#eeb4e9",
-  secondary  = "#d9bfd4",
-  tertiary   = "#f6b8aa",
+  primary    = "#b4c4ff",
+  secondary  = "#c1c5dd",
+  tertiary   = "#e2bbdb",
 
   -- UI
-  selection  = "#393338", -- Seleção mais visível
-  border     = "#4d444b",
+  selection  = "#34343a", -- Seleção mais visível
+  border     = "#45464f",
   error      = "#ffb4ab",
-  warn       = "#f6b8aa",
+  warn       = "#e2bbdb",
 }
