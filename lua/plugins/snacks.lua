@@ -1,3 +1,42 @@
+-- Reads ~/.config/nvim/colorscheme.lua (managed by the dotfiles theme switcher)
+-- and returns true when the Berserk theme is active.
+local function is_berserk()
+  local ok, cs = pcall(dofile, vim.fn.stdpath("config") .. "/colorscheme.lua")
+  return ok and cs == "chadarch-berserk"
+end
+
+local BERSERK_HEADER = table.concat({
+  "",
+  "  ████▓▒   ███████  █████▒   ▒█████   ███████  █████▒   ██  ▒██",
+  "  ██  ██   ██       ██  ██   ██        ██       ██  ██   ██▒██  ",
+  "  ████▓▒   ████▒    █████▒   ▒████▒    ████▒    █████▒   ████▒  ",
+  "  ██  ██   ██       ██ ██        ██     ██       ██ ██    ██▒██  ",
+  "  ████▓▒   ███████  ██  ██   █████▒    ███████  ██  ██   ██  ▒██",
+  "",
+  "  ───────────────────────────────────────────────────────────",
+  "   \"Is the destiny of mankind controlled by some",
+  "     transcendental entity or law? It is Causality.\"",
+  "  ───────────────────────────────────────────────────────────",
+  "                                        — Skull Knight",
+}, "\n")
+
+local CHADARCH_HEADER = table.concat({
+  "▒████▒  ██    ██    ▒██▒    █████▒    ██▒  ▒██   ██████   ███  ███ ",
+  "  ▓██████  ██    ██    ▓██▓    ███████   ██▓  ▓██   ██████   ███  ███ ",
+  " ▒██▒  ░█  ██    ██    ████    ██  ▒██▒  ▒██  ██▒     ██     ███▒▒███ ",
+  " ██▓       ██    ██    ████    ██   ▒██  ██▒  ██▒     ██     ███▓▓███ ",
+  " ██░       ██    ██   ▒█▓▓█▒   ██   ░██   ██ ░██      ██     ██▓██▓██ ",
+  " ██        ██    ██   ▓█▒▒█▓   ██    ██   ██▒▒██      ██     ██▒██▒██ ",
+  " ██        ████████   ██  ██   ██    ██   ██▒▒██      ██     ██░██░██ ",
+  " ██░       ██    ██   ██████   ██   ░██   ▒████▒      ██     ██ ██ ██ ",
+  " ██▓       ██    ██  ░██████░  ██   ▒██   ░████░      ██     ██    ██ ",
+  " ▒██▒  ░█  ██    ██  ▒██  ██▒  ██  ▒██▒    ████       ██     ██    ██ ",
+  "  ▓██████  ██    ██  ███  ███  ███████     ████     ██████   ██    ██ ",
+  "   ▒████▒  ██    ██  ██▒  ▒██  █████▒      ▓██▓     ██████   ██    ██ ",
+}, "\n")
+
+local berserk = is_berserk()
+
 return {
   "folke/snacks.nvim",
   -- cond = not vim.g.vscode,
@@ -7,37 +46,24 @@ return {
     bigfile = { enabled = false },
     dashboard = { enabled = true,
       preset = {
-        header = table.concat({
-          "▒████▒  ██    ██    ▒██▒    █████▒    ██▒  ▒██   ██████   ███  ███ ",
-          "  ▓██████  ██    ██    ▓██▓    ███████   ██▓  ▓██   ██████   ███  ███ ",
-          " ▒██▒  ░█  ██    ██    ████    ██  ▒██▒  ▒██  ██▒     ██     ███▒▒███ ",
-          " ██▓       ██    ██    ████    ██   ▒██  ██▒  ██▒     ██     ███▓▓███ ",
-          " ██░       ██    ██   ▒█▓▓█▒   ██   ░██   ██ ░██      ██     ██▓██▓██ ",
-          " ██        ██    ██   ▓█▒▒█▓   ██    ██   ██▒▒██      ██     ██▒██▒██ ",
-          " ██        ████████   ██  ██   ██    ██   ██▒▒██      ██     ██░██░██ ",
-          " ██░       ██    ██   ██████   ██   ░██   ▒████▒      ██     ██ ██ ██ ",
-          " ██▓       ██    ██  ░██████░  ██   ▒██   ░████░      ██     ██    ██ ",
-          " ▒██▒  ░█  ██    ██  ▒██  ██▒  ██  ▒██▒    ████       ██     ██    ██ ",
-          "  ▓██████  ██    ██  ███  ███  ███████     ████     ██████   ██    ██ ",
-          "   ▒████▒  ██    ██  ██▒  ▒██  █████▒      ▓██▓     ██████   ██    ██ ",
-        }, "\n"),
+        header = berserk and BERSERK_HEADER or CHADARCH_HEADER,
       },
       sections = {
         {
           { section = "header" },
           { section = "keys", gap = 1, padding = 1 },
           { section = "startup" },
-          {
+          berserk and {
             section = "terminal",
-            cmd = "ascii-image-converter $HOME/.config/nvim/images/giphy.gif -C -c",
+            cmd = "python3 ~/dotfiles/scripts/berserk-art.py",
             random = 10,
             pane = 2,
             indent = 4,
             height = 30,
-          },
+          } or nil,
         },
       },
-    }, 
+    },
     explorer = { enabled = true },
     indent = { enabled = true },
     input = { enabled = true },
