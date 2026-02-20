@@ -120,3 +120,40 @@ O `coc.nvim` pode precisar instalar suas próprias extensões. Use o comando `:C
 ```
 
 Sua configuração está pronta!
+
+
+OBS: Para usar o tema do matugen, é Necessário colocar  o codigo abaixo em ~/.config/matugen/config.toml
+
+``` bash
+# ~/.config/matugen/config.toml
+[config]
+reload_apps = true
+
+[templates.nvim]
+input_path = "~/.config/matugen/templates/nvim_colors.lua"
+output_path = "~/.config/nvim/lua/matugen_colors.lua"
+```
+
+
+``` bash
+# ~/.config/matugen/templates/nvim_colors.lua
+return {
+  -- === MUDANÇAS PARA FICAR PASTEL ===
+  background = "{{colors.surface_container.default.hex}}",
+  foreground = "{{colors.on_surface.default.hex}}", 
+
+  cursorline = "{{colors.surface_container_high.default.hex}}",
+  comment    = "{{colors.outline.default.hex}}",
+
+  -- Destaques (Mantém iguais)
+  primary    = "{{colors.primary.default.hex}}",
+  secondary  = "{{colors.secondary.default.hex}}",
+  tertiary   = "{{colors.tertiary.default.hex}}",
+
+  -- UI
+  selection  = "{{colors.surface_container_highest.default.hex}}", -- Seleção mais visível
+  border     = "{{colors.outline_variant.default.hex}}",
+  error      = "{{colors.error.default.hex}}",
+  warn       = "{{colors.tertiary.default.hex}}",
+}
+```
