@@ -55,7 +55,7 @@ return {
           { section = "startup" },
           berserk and {
             section = "terminal",
-            cmd = "python3 ~/dotfiles/scripts/berserk-art.py",
+            cmd = "python3 ~/.config/nvim/scripts/berserk-art.py",
             random = 10,
             pane = 2,
             indent = 4,
