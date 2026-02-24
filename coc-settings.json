@@ -14,18 +14,10 @@
   ],
   "suggest.acceptSuggestionOnCommitCharacter": false,
   "clangd.arguments": [
-    // Estas flags são usadas quando compile_commands.json não é encontrado.
     "--compile-commands-dir=.",
-    "-std=c++20",
-    "-Wall",
-    "-Wextra",
-     "-I/usr/include/c++/11" 
+    "--clang-tidy",
+    "--header-insertion=iwyu",
+    "--background-index"
   ],
-  "languageserver": {
-    "clangd": {
-      "command": "clangd",
-      "rootPatterns": ["compile_commands.json", "compile_flags.txt", ".git/"],
-      "filetypes": ["c", "cpp", "objc", "objcpp"]
-    }
-  }
+  "clangd.path": "~/.config/coc/extensions/coc-clangd-data/install/21.1.8/clangd_21.1.8/bin/clangd"
 }
