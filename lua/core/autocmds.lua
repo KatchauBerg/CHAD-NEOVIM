@@ -1,7 +1,24 @@
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 
--- Cria os grupos de autocomando
+vim.diagnostic.config({
+  virtual_text = true,
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  float = {
+    border = "rounded",
+    source = true,
+  },
+})
+
+autocmd("CursorHold", {
+  group = augroup("DiagnosticFloat", { clear = true }),
+  callback = function()
+    vim.diagnostic.open_float(nil, { focus = false })
+  end,
+})
+
 local theme_group = augroup('ThemeHandler', { clear = true })
 local matugen_group = augroup('MatugenReload', { clear = true })
 
