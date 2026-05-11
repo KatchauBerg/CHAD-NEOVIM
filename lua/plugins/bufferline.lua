@@ -1,5 +1,6 @@
 return {
   "akinsho/bufferline.nvim",
+  event = "VeryLazy",
   -- cond = not vim.g.vscode,
   keys = {
     { "<Tab>", "<cmd> BufferLineCycleNext <CR>", desc = "BufferLine: Next Buffer" },
