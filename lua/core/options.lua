@@ -1,7 +1,7 @@
 local opt = vim.opt
 vim.g.mapleader = " "
 
-opt.laststatus = 3 -- global statusline
+opt.laststatus = 3
 opt.showmode = false
 
 opt.clipboard = "unnamedplus"
@@ -27,6 +27,13 @@ opt.termguicolors = true
 opt.timeoutlen = 400
 opt.undofile = true
 opt.cursorline = true
+
+opt.updatetime = 250
+opt.scrolloff = 8
+opt.sidescrolloff = 8
+opt.swapfile = false
+opt.pumheight = 10
+opt.wrap = false
 
 local is_windows = vim.loop.os_uname().sysname == "Windows_NT"
 vim.env.PATH = vim.env.PATH .. (is_windows and ";" or ":") .. vim.fn.stdpath "data" .. "/mason/bin"

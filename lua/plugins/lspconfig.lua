@@ -22,29 +22,13 @@ return {
       end,
     })
 
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-
-    capabilities.textDocument.completion.completionItem = {
-      documentationFormat = { "markdown", "plaintext" },
-      snippetSupport = true,
-      preselectSupport = true,
-      insertReplaceSupport = true,
-      labelDetailsSupport = true,
-      deprecatedSupport = true,
-      commitCharactersSupport = true,
-      tagSupport = { valueSet = { 1 } },
-      resolveSupport = {
-        properties = {
-          "documentation",
-          "detail",
-          "additionalTextEdits",
-        },
-      },
-    }
+    local capabilities = vim.tbl_deep_extend(
+      "force",
+      vim.lsp.protocol.make_client_capabilities(),
+      require("cmp_nvim_lsp").default_capabilities()
+    )
 
     vim.lsp.config("*", { capabilities = capabilities })
-    local servers = { "html", "cssls" , 'lua_ls', 'pylsp' }
-
-    vim.lsp.enable(servers)
+    vim.lsp.enable({ "html", "cssls", "lua_ls", "pylsp", "ts_ls", "clangd" })
   end,
 }

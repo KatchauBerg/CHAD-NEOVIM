@@ -1,1 +1,1 @@
-return { "echasnovski/mini.statusline", opts = {} }
+return { "echasnovski/mini.statusline", enabled = false }

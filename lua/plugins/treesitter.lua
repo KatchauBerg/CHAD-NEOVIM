@@ -14,23 +14,15 @@ return {
         "python",
         "json",
         "markdown",
-        "tsx"
+        "tsx",
+        "c",
+        "cpp",
       },
 
       highlight = {
         enable = true,
-        use_languagetree = true,
-      },
-      autotag = {
-        enable = true,
       },
       indent = { enable = true },
-
-      rainbow = {
-        enable = true,
-        extended_mode = true,
-        max_file_lines = nil,
-      },
     }
   end,
 }
