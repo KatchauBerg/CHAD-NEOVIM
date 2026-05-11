@@ -1,6 +1,7 @@
 return {
   "neovim/nvim-lspconfig",
   cond = not vim.g.vscode,
+  event = { "BufReadPre", "BufNewFile" },
   config = function()
     -- Use LspAttach autocommand to only map the following keys
     vim.api.nvim_create_autocmd("LspAttach", {

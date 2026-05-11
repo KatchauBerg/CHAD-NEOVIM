@@ -15,3 +15,7 @@ end
 
 map("n", "<leader>rn", ":lua _G.toggle_relative_numbers()<CR>", { desc = "Toggle Relative Numbers" })
 
+map("n", "<A-h>", function() Snacks.terminal(nil, { win = { position = "bottom" } }) end, { desc = "Terminal: Horizontal Split" })
+map("n", "<A-v>", function() Snacks.terminal(nil, { win = { position = "right" } }) end, { desc = "Terminal: Vertical Split" })
+map("n", "<A-i>", function() Snacks.terminal() end, { desc = "Terminal: Float" })
+
