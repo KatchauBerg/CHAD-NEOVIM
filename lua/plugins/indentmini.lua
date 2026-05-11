@@ -1,1 +1,1 @@
-return { "nvimdev/indentmini.nvim", event = { "BufReadPre", "BufNewFile" }, opts = {} }
+return { "nvimdev/indentmini.nvim", enabled = false }
