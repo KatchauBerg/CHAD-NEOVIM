@@ -1,9 +1,30 @@
 -- Reads ~/.config/nvim/colorscheme.lua (managed by the dotfiles theme switcher)
--- and returns true when the Berserk theme is active.
-local function is_berserk()
+local function active_theme()
   local ok, cs = pcall(dofile, vim.fn.stdpath("config") .. "/colorscheme.lua")
-  return ok and cs == "chadarch-berserk"
+  return ok and cs or ""
 end
+
+local function is_berserk()
+  return active_theme() == "chadarch-berserk"
+end
+
+local function is_bolsonaro()
+  return active_theme() == "chadarch-bolsonaro"
+end
+
+local BOLSONARO_HEADER = table.concat({
+  "",
+  "  ██████   ██████  ██      ███████  ██████  ██    ██ ██ ███    ███ ",
+  "  ██   ██ ██    ██ ██      ██      ██    ██ ██    ██ ██ ████  ████ ",
+  "  ██████  ██    ██ ██      ███████ ██    ██ ██    ██ ██ ██ ████ ██ ",
+  "  ██   ██ ██    ██ ██           ██ ██    ██  ██  ██  ██ ██  ██  ██ ",
+  "  ██████   ██████  ███████ ███████  ██████    ████   ██ ██      ██ ",
+  "",
+  "  ───────────────────────────────────────────────────────────────",
+  "         Brasil acima de tudo e Deus acima de todos",
+  "  ───────────────────────────────────────────────────────────────",
+  "",
+}, "\n")
 
 local BERSERK_HEADER = table.concat({
   "",
@@ -35,7 +56,8 @@ local CHADARCH_HEADER = table.concat({
   "   ▒████▒  ██    ██  ██▒  ▒██  █████▒      ▓██▓     ██████   ██    ██ ",
 }, "\n")
 
-local berserk = is_berserk()
+local berserk    = is_berserk()
+local bolsonaro  = is_bolsonaro()
 
 return {
   "folke/snacks.nvim",
@@ -46,14 +68,14 @@ return {
     bigfile = { enabled = false },
     dashboard = { enabled = true,
       preset = {
-        header = berserk and BERSERK_HEADER or CHADARCH_HEADER,
+        header = berserk and BERSERK_HEADER or bolsonaro and BOLSONARO_HEADER or CHADARCH_HEADER,
       },
       sections = {
         {
           { section = "header" },
           { section = "keys", gap = 1, padding = 1 },
           { section = "startup" },
-          berserk and {
+          (berserk and not bolsonaro) and {
             section = "terminal",
             cmd = "python3 ~/.config/nvim/scripts/berserk-art.py",
             random = 10,

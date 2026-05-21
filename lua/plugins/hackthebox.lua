@@ -1,3 +1,0 @@
-return {
-  "audibleblink/hackthebox.vim",
-}
