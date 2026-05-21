@@ -1,3 +1,8 @@
+-- Fast lua bytecode cache (Neovim 0.9+)
+if vim.loader and vim.loader.enable then
+  vim.loader.enable()
+end
+
 require('core.options')
 require('core.mappings')
 require('core.commands')

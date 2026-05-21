@@ -21,6 +21,18 @@ autocmd("CursorHold", {
 
 local theme_group = augroup('ThemeHandler', { clear = true })
 local matugen_group = augroup('MatugenReload', { clear = true })
+local bg_group = augroup('BackgroundMode', { clear = true })
+
+-- Re-apply transparency/blur after any colorscheme change
+autocmd('ColorScheme', {
+  group = bg_group,
+  pattern = '*',
+  callback = function()
+    vim.schedule(function()
+      pcall(function() require('config.background').apply() end)
+    end)
+  end,
+})
 
 
 
