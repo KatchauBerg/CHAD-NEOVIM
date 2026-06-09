@@ -164,12 +164,27 @@ end
 
 local function open(dash_buf)
   close()
+  if not require("config.jokes").enabled() then return end -- jokes off: logo only
   local media = theme_media.current().media
   if not media then return end -- theme opted out of a dashboard overlay
   if media:lower():match("%.gif$") then
     open_gif(dash_buf, media)
   else
     open_static(dash_buf, media)
+  end
+end
+
+-- Hide any current overlay (used by the jokes toggle).
+function M.hide() close() end
+
+-- Re-render the overlay on the visible dashboard, if any (used by the toggle).
+function M.refresh()
+  for _, w in ipairs(vim.api.nvim_list_wins()) do
+    local b = vim.api.nvim_win_get_buf(w)
+    if vim.bo[b].filetype == "snacks_dashboard" then
+      open(b)
+      return
+    end
   end
 end
 

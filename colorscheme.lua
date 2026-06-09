@@ -1,1 +1,1 @@
-return "chadarch-berserk"
+return "catppuccin-mocha"
