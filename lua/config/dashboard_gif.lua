@@ -29,38 +29,48 @@ local function active_theme()
   return ok and cs or ""
 end
 
--- Split the captured chafa output into HEIGHT-line frames (it renders each
--- frame as exactly HEIGHT rows). The first block carries setup escapes, drop it.
+-- Frames are cached as clean per-frame chafa blocks separated by a form-feed
+-- sentinel (0x0c). Each block is the same fixed size, so cycling them never
+-- drifts (the old "scrolling" bug came from splitting chafa's animated stream
+-- by a guessed line count).
+local SENTINEL = "\12\n"
+
 local function load_frames()
   local fd = io.open(FRAMES_FILE, "rb")
   if not fd then return nil end
   local data = fd:read("*a")
   fd:close()
   if not data or #data == 0 then return nil end
-  local lines = vim.split(data, "\n", { plain = true })
   local frames = {}
-  local n = math.floor(#lines / HEIGHT)
-  for i = 1, n do
-    local s = (i - 1) * HEIGHT + 1
-    frames[#frames + 1] = table.concat(vim.list_slice(lines, s, s + HEIGHT - 1), "\r\n")
+  for _, part in ipairs(vim.split(data, SENTINEL, { plain = true })) do
+    if part:match("%S") then
+      local lines = vim.split(part, "\n", { plain = true })
+      while #lines > 0 and lines[#lines] == "" do table.remove(lines) end
+      frames[#frames + 1] = table.concat(lines, "\r\n")
+    end
   end
-  if #frames > 2 then table.remove(frames, 1) end -- drop setup-noise frame
   return #frames > 0 and frames or nil
 end
 
--- Render all GIF frames once and cache them. Async so it never blocks startup.
+-- Extract every GIF frame with ffmpeg, render each to a fixed-size chafa block,
+-- join with the sentinel. Async so it never blocks startup.
 local function generate(cb)
-  if vim.fn.executable("chafa") ~= 1 or not vim.uv.fs_stat(GIF_PATH) then return end
-  local cmd = string.format(
-    "timeout 4 chafa -f symbols --relative off --animate on --align center,center --view-size %dx%d %s",
-    WIDTH, HEIGHT, vim.fn.shellescape(GIF_PATH)
-  )
-  vim.system({ "sh", "-c", cmd }, { text = false }, function(res)
-    if res.stdout and #res.stdout > 0 then
-      local out = assert(io.open(FRAMES_FILE, "wb"))
-      out:write(res.stdout)
-      out:close()
-    end
+  if vim.fn.executable("chafa") ~= 1 or vim.fn.executable("ffmpeg") ~= 1 then return end
+  if not vim.uv.fs_stat(GIF_PATH) then return end
+  local tmp = vim.fn.stdpath("cache") .. "/chadvim_frames_png"
+  local gif, out, dir = vim.fn.shellescape(GIF_PATH), vim.fn.shellescape(FRAMES_FILE), vim.fn.shellescape(tmp)
+  local script = table.concat({
+    "set -e",
+    "rm -rf " .. dir .. " && mkdir -p " .. dir,
+    "ffmpeg -loglevel error -i " .. gif .. " " .. dir .. "/%04d.png",
+    ": > " .. out,
+    "for f in $(ls " .. dir .. "/*.png | sort); do",
+    string.format('  chafa -f symbols --align center,center --view-size %dx%d "$f" >> %s', WIDTH, HEIGHT, out),
+    "  printf '\\f\\n' >> " .. out,
+    "done",
+    "rm -rf " .. dir,
+  }, "\n")
+  vim.system({ "sh", "-c", script }, { text = false }, function()
     if cb then vim.schedule(cb) end
   end)
 end
@@ -97,7 +107,11 @@ local function make_float(dash_buf)
     border = "none",
     noautocmd = true,
   })
-  vim.wo[win].winhighlight = "Normal:SnacksDashboardTerminal,NormalFloat:SnacksDashboardTerminal"
+  -- Solid, opaque background so the transparent terminal behind nvim doesn't
+  -- bleed through the image's dark cells (bg mode is "transparent"/"blur").
+  vim.api.nvim_set_hl(0, "ChadvimDashGifBg", { bg = "#0c0c14" })
+  vim.wo[win].winhighlight = "Normal:ChadvimDashGifBg,NormalFloat:ChadvimDashGifBg"
+  vim.wo[win].winblend = 0
   chan = vim.api.nvim_open_term(buf, {})
   return true
 end
