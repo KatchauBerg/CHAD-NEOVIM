@@ -1,131 +1,210 @@
 # Minha Configuração Neovim
 
-Esta é uma configuração personalizada para o Neovim, organizada de forma modular e gerenciada pelo plugin manager [lazy.nvim](https://github.com/folke/lazy.nvim).
+Configuração personalizada do Neovim, modular, gerenciada pelo [lazy.nvim](https://github.com/folke/lazy.nvim). Funciona em **Linux**, **Windows** e **macOS**.
 
 ## Visão Geral
 
-A estrutura foi projetada para ser limpa e de fácil manutenção:
+```
+~/.config/nvim/
+├── init.lua              # ponto de entrada
+├── colorscheme.lua       # tema ativo (retorna o nome do colorscheme)
+├── lua/
+│   ├── core/             # opções, keymaps, autocmds base
+│   ├── plugins/          # um arquivo por plugin
+│   └── config/           # módulos próprios (música, dashboard, jokes…)
+├── nvim-themes/colors/   # temas chadarch-* (gigachad, berserk, bolsonaro…)
+├── images/               # arte do dashboard por tema
+└── songs/                # música de fundo por tema
+```
 
--   `lua/core`: Configurações base do Neovim (opções, mapas de teclado, etc.).
--   `lua/plugins`: Configuração de cada plugin em seu próprio arquivo.
--   `lua/config`: Configuração do plugin manager `lazy.nvim`.
+## Recursos extras desta config
 
-## Pré-requisitos
+| Recurso | O que faz | Dependência |
+|---------|-----------|-------------|
+| Dashboard com imagem/GIF | mostra arte animada abaixo do logo, por tema | `chafa` + `ffmpeg` |
+| Música de fundo | toca música ao abrir, controlável com `<leader>m…` | `mpv` |
+| Toggle de "piadas" | `:Jokes` / `<leader>uj` liga/desliga imagem + música | — |
+| Obsidian | abre seus cofres pra anotação (`<leader>o…`) | — |
+| Temas chadarch | gigachad, berserk, bolsonaro, hacking, kuromi | — |
 
-### Comum a Ambos os Sistemas
-
--   **[Neovim](https://neovim.io/) v0.8.0** ou superior.
--   **[Git](https://git-scm.com/)**.
--   **[Nerd Font](https://www.nerdfonts.com/)**: Essencial para que os ícones sejam exibidos corretamente. Instale uma, como a `FiraCode Nerd Font`, e configure seu terminal para usá-la.
--   **[Node.js](https://nodejs.org/en/) e npm**: Necessário para o `coc.nvim`.
+Imagem e música por tema configuram-se num só lugar: `lua/config/theme_media.lua`.
 
 ---
 
+## Pré-requisitos (todos os sistemas)
 
-### Linux
+| Ferramenta | Pra quê | Obrigatório |
+|------------|---------|-------------|
+| **Neovim 0.9+** | o editor | sim |
+| **Git** | clonar config + plugins | sim |
+| **Compilador C** (`gcc`/`clang`/MSVC) | compilar parsers do treesitter | sim |
+| **Node.js + npm** | `coc.nvim` e LSPs | sim |
+| **ripgrep** | grep do snacks/telescope | sim |
+| **fzf** | busca fuzzy | recomendado |
+| **Nerd Font** | ícones (ex. FiraCode Nerd Font) | sim |
+| **chafa** | imagem/GIF no dashboard | opcional |
+| **ffmpeg** | extrair frames do GIF do dashboard | opcional |
+| **mpv** | música de fundo | opcional |
 
--   **Compilador C**: Necessário para compilar o `nvim-treesitter` e outros plugins.
--   **`libnotify-bin`**: Opcional, para receber notificações do sistema do plugin `pomo.nvim`.
+> Sem `chafa`/`ffmpeg`/`mpv` o Neovim funciona normal — só não mostra a arte/toca música. Pra desligar de vez: `:Jokes`.
 
-**Comandos para instalação (exemplo para Ubuntu/Debian):**
-```bash
-sudo apt-get update
-sudo apt-get install build-essential # Compilador C
-sudo apt-get install libnotify-bin   # Notificações (opcional)
-```
-
-**Exemplo para Arch Linux:**
-```bash
-sudo pacman -Syu base-devel libnotify
-```
+**Nerd Font:** baixe em [nerdfonts.com](https://www.nerdfonts.com/) e configure no seu terminal. Terminal recomendado: [kitty](https://sw.kovidgoyal.com/kitty/) (melhor render da arte do dashboard).
 
 ---
 
+## 🐧 Linux
 
-### Windows
+### Dependências
 
--   **Compilador C**: O mais fácil é instalar as **Build Tools for Visual Studio**.
-    -   Durante a instalação, selecione a carga de trabalho "**Desenvolvimento para desktop com C++**".
--   **`winget`**: Geralmente já vem instalado no Windows 10 e 11. Usaremos para facilitar a instalação de outras ferramentas.
-
-**Comandos para instalação (usando `winget` no PowerShell):**
-```powershell
-# Instalar Neovim
-winget install Neovim.Neovim
-
-# Instalar Node.js (inclui npm)
-winget install OpenJS.NodeJS
-```
-
-## Instalação
-
-### 🐧 Linux
-
-1.  **Faça backup da sua configuração atual (se houver):**
-    ```bash
-mv ~/.config/nvim ~/.config/nvim.bak
-```
-
-2.  **Clone este repositório:**
+**Debian / Ubuntu:**
 ```bash
-git clone <URL_DO_SEU_REPOSITORIO> ~/.config/nvim
+sudo apt update
+sudo apt install -y git curl build-essential ripgrep fzf chafa ffmpeg mpv nodejs npm
+# Neovim recente (o do apt costuma ser antigo):
+sudo add-apt-repository ppa:neovim-ppa/unstable -y && sudo apt update && sudo apt install -y neovim
 ```
-*Substitua `<URL_DO_SEU_REPOSITORIO>` pela URL do seu repositório Git.*
 
-3.  **Inicie o Neovim:**
-    ```bash
+**Arch / Manjaro:**
+```bash
+sudo pacman -Syu neovim git base-devel ripgrep fzf chafa ffmpeg mpv nodejs npm
+```
+
+**Fedora:**
+```bash
+sudo dnf install -y neovim git gcc gcc-c++ ripgrep fzf chafa ffmpeg mpv nodejs npm
+```
+
+### Instalar a config
+```bash
+# backup da config atual, se houver
+mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
+
+git clone https://github.com/KatchauBerg/CHAD-NEOVIM.git ~/.config/nvim
 nvim
 ```
-O `lazy.nvim` será instalado automaticamente na primeira vez que você abrir o Neovim.
+`lazy.nvim` instala os plugins na primeira abertura.
 
 ---
 
+## 🍎 macOS
 
-### 🪟 Windows
+Usa [Homebrew](https://brew.sh/). Instale-o primeiro se não tiver:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
-1.  **Abra o PowerShell** e faça backup da sua configuração atual (se houver):
+### Dependências
+```bash
+brew install neovim git ripgrep fzf chafa ffmpeg mpv node
+xcode-select --install   # compilador C (clang)
+```
+Nerd Font via brew:
+```bash
+brew install --cask font-fira-code-nerd-font
+```
+
+### Instalar a config
+```bash
+mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
+
+git clone https://github.com/KatchauBerg/CHAD-NEOVIM.git ~/.config/nvim
+nvim
+```
+
+---
+
+## 🪟 Windows
+
+Usa `winget` (já vem no Win 10/11) + [Scoop](https://scoop.sh/).
+
+### Dependências
 ```powershell
+# Scoop (se não tiver):
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+
+# Neovim, Git, Node
+winget install Neovim.Neovim Git.Git OpenJS.NodeJS
+
+# CLI tools via Scoop
+scoop install ripgrep fzf chafa ffmpeg mpv
+
+# Compilador C: Build Tools for Visual Studio
+#   https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022
+#   marque a carga "Desenvolvimento para desktop com C++"
+```
+
+### Instalar a config
+```powershell
+# backup, se houver
 move $env:LOCALAPPDATA\nvim $env:LOCALAPPDATA\nvim.bak
-```
 
-2.  **Clone este repositório:**
-    ```powershell
-git clone <URL_DO_SEU_REPOSITORIO> $env:LOCALAPPDATA\nvim
-```
-*Substitua `<URL_DO_SEU_REPOSITORIO>` pela URL do seu repositório Git.*
-
-3.  **Inicie o Neovim:**
-```powershell
+git clone https://github.com/KatchauBerg/CHAD-NEOVIM.git $env:LOCALAPPDATA\nvim
 nvim
 ```
-O `lazy.nvim` será instalado e configurado automaticamente.
 
-## Pós-instalação
+> No Windows a música (`mpv`) e a arte (`chafa`) funcionam melhor em terminais modernos (Windows Terminal). A arte do dashboard pode variar por terminal.
 
-Após a primeira inicialização, os plugins serão baixados e instalados.
+---
 
-1.  **Sincronize os Plugins:**
-Pode ser que você precise reiniciar o Neovim uma vez. Depois, execute o comando abaixo dentro do Neovim para garantir que tudo está instalado e atualizado corretamente:
-    ```
-:Lazy sync
+## Pós-instalação (todos os sistemas)
+
+1. **Sincronizar plugins** — dentro do Neovim:
+   ```
+   :Lazy sync
+   ```
+2. **Checar saúde:**
+   ```
+   :checkhealth
+   ```
+3. **Extensões do coc.nvim:**
+   ```
+   :CocInstall coc-tsserver coc-pyright coc-json
+   ```
+
+Reinicie o Neovim. Pronto.
+
+---
+
+## Trocar de tema
+
+Edite `colorscheme.lua` e retorne o nome do tema:
+```lua
+return "chadarch-gigachad"
 ```
+Temas inclusos: `chadarch-gigachad`, `chadarch-berserk`, `chadarch-bolsonaro`, `chadarch-hacking`, `chadarch-kuromi`, além de catppuccin, gruvbox, kanagawa, nightfox, hackthebox.
 
-2.  **Verifique a Saúde da Instalação:**
-Use o comando `:checkhealth` para verificar se há algum problema com a instalação do Neovim ou dos plugins.
-
-3.  **COC (Conquer of Completion):**
-O `coc.nvim` pode precisar instalar suas próprias extensões. Use o comando `:CocInstall` para instalar servidores de linguagem, por exemplo:
+### Adicionar imagem/música a um tema
+Em `lua/config/theme_media.lua`:
+```lua
+M.themes = {
+  ["meu-tema"] = {
+    media = "images/minhaarte.gif",  -- .gif anima; .jpg/.png é estático
+    music = "songs/minhapasta",      -- pasta (toca tudo) OU arquivo único
+  },
+}
 ```
-:CocInstall coc-tsserver coc-pyright coc-json
-```
+Caminhos relativos a `~/.config/nvim`. Omita `media`/`music` pra desativar cada um.
 
-Sua configuração está pronta!
+---
 
+## Atalhos úteis
 
-OBS: Para usar o tema do matugen, é Necessário colocar  o codigo abaixo em ~/.config/matugen/config.toml
+| Atalho | Ação |
+|--------|------|
+| `<leader>o…` | Obsidian (cofres, notas) |
+| `<leader>mm` | música: liga/desliga |
+| `<leader>mp` | música: pause/play |
+| `<leader>mn` / `<leader>mb` | próxima / anterior |
+| `<leader>m=` / `<leader>m-` | volume +/- |
+| `<leader>uj` ou `:Jokes` | liga/desliga imagem + música do dashboard |
 
-``` bash
-# ~/.config/matugen/config.toml
+---
+
+## Tema matugen (opcional)
+
+Pra usar o tema dinâmico do matugen, coloque em `~/.config/matugen/config.toml`:
+```toml
 [config]
 reload_apps = true
 
@@ -134,24 +213,17 @@ input_path = "~/.config/matugen/templates/nvim_colors.lua"
 output_path = "~/.config/nvim/lua/matugen_colors.lua"
 ```
 
-
-``` bash
-# ~/.config/matugen/templates/nvim_colors.lua
+E em `~/.config/matugen/templates/nvim_colors.lua`:
+```lua
 return {
-  -- === MUDANÇAS PARA FICAR PASTEL ===
   background = "{{colors.surface_container.default.hex}}",
-  foreground = "{{colors.on_surface.default.hex}}", 
-
+  foreground = "{{colors.on_surface.default.hex}}",
   cursorline = "{{colors.surface_container_high.default.hex}}",
   comment    = "{{colors.outline.default.hex}}",
-
-  -- Destaques (Mantém iguais)
   primary    = "{{colors.primary.default.hex}}",
   secondary  = "{{colors.secondary.default.hex}}",
   tertiary   = "{{colors.tertiary.default.hex}}",
-
-  -- UI
-  selection  = "{{colors.surface_container_highest.default.hex}}", -- Seleção mais visível
+  selection  = "{{colors.surface_container_highest.default.hex}}",
   border     = "{{colors.outline_variant.default.hex}}",
   error      = "{{colors.error.default.hex}}",
   warn       = "{{colors.tertiary.default.hex}}",
