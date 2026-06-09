@@ -12,7 +12,7 @@ Repositório: `https://github.com/KatchauBerg/CHAD-NEOVIM.git`
 | **Neovim 0.9+** | o editor | sim |
 | **Git** | clonar config + plugins | sim |
 | **Compilador C** (`gcc`/`clang`/MSVC) | parsers do treesitter | sim |
-| **Node.js + npm** | `coc.nvim` e LSPs | sim |
+| **Node.js + npm** | LSPs JS/TS e ferramentas | sim |
 | **ripgrep** | grep do snacks/telescope | sim |
 | **fzf** | busca fuzzy | recomendado |
 | **Nerd Font** | ícones (ex. FiraCode Nerd Font) | sim |
@@ -127,9 +127,9 @@ nvim
 
 Dentro do Neovim:
 ```
-:Lazy sync                                   " sincronizar plugins
-:checkhealth                                 " verificar problemas
-:CocInstall coc-tsserver coc-pyright coc-json " LSPs do coc
+:Lazy sync     " sincronizar plugins
+:checkhealth   " verificar problemas
+:Mason         " instalar servidores LSP (ex. lua-language-server, pyright)
 ```
 Reinicie o Neovim. Pronto.
 
