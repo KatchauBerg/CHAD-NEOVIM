@@ -17,7 +17,7 @@
 -- same path with a single draw.
 local M = {}
 
-local WIDTH, HEIGHT = 44, 20 -- float / render size in cells
+local WIDTH, HEIGHT = 32, 16 -- float / render size in cells (fits below the logo)
 local FPS = 14
 local GIF_PATH = vim.fn.stdpath("config") .. "/images/giphy.gif"
 local IMG_BOLSONARO = vim.fn.stdpath("config") .. "/images/capitao.jpg"
@@ -84,13 +84,33 @@ local function close()
   win, buf, chan, timer = nil, nil, nil, nil
 end
 
--- Build the floating terminal window over the right of the dashboard.
+-- Window row of the gap reserved in snacks below the header: the first run of
+-- >= HEIGHT blank lines that comes *after* the header art. Robust to headers
+-- that contain their own blank lines (e.g. bolsonaro) and to top centring padding.
+local function gap_row(dash_buf)
+  local lines = vim.api.nvim_buf_get_lines(dash_buf, 0, -1, false)
+  local seen_content, run_start, run = false, nil, 0
+  for idx = 1, #lines do
+    if lines[idx]:match("^%s*$") then
+      if seen_content then
+        if run == 0 then run_start = idx end
+        run = run + 1
+        if run >= HEIGHT then return run_start - 1 end -- 0-based row
+      end
+    else
+      seen_content, run = true, 0
+    end
+  end
+  return run_start and (run_start - 1) or 0
+end
+
+-- Build the floating terminal window centred horizontally, just below the logo.
 local function make_float(dash_buf)
   local dash_win = vim.fn.bufwinid(dash_buf)
   if dash_win == -1 then return false end
-  local W, H = vim.api.nvim_win_get_width(dash_win), vim.api.nvim_win_get_height(dash_win)
-  local col = math.min(math.floor(W * 0.54), W - WIDTH - 1)
-  local row = math.max(0, math.floor((H - HEIGHT) / 2))
+  local W = vim.api.nvim_win_get_width(dash_win)
+  local col = math.max(0, math.floor((W - WIDTH) / 2))
+  local row = gap_row(dash_buf)
 
   buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].scrollback = 1

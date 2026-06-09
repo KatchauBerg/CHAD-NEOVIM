@@ -77,7 +77,10 @@ return {
       },
       sections = {
         {
-          { section = "header" },
+          -- padding reserves the gap where dashboard_gif.lua draws the media
+          -- (must match HEIGHT in lua/config/dashboard_gif.lua), so the gif sits
+          -- below the logo without covering the options.
+          { section = "header", padding = 16 },
           { section = "keys", gap = 1, padding = 1 },
           { section = "startup" },
           (berserk and not bolsonaro) and {
