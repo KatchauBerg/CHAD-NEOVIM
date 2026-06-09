@@ -1,42 +1,28 @@
--- Dashboard media overlay, themed.
---   * CHADVIM theme  -> animated giphy.gif (frame-cycled, see below)
---   * bolsonaro theme -> static capitao.jpg
---   * berserk theme   -> nothing (it has its own art pane in snacks)
+-- Dashboard media overlay. Which image/gif shows per theme is configured in
+-- lua/config/theme_media.lua; this module just renders whatever it's given:
+--   * .gif  -> animated (frames extracted with ffmpeg, rendered with chafa,
+--              cached, then cycled in-place on a terminal channel)
+--   * other -> static single chafa render
 --
--- Why the GIF isn't just `chafa <gif>` in a terminal:
---   * snacks' dashboard `terminal` section caches output and kills the job on
---     re-render, so a live process freezes.
---   * chafa's own animation either scrolls (frames separated by newlines unless
---     --relative is on) or stalls inside nvim's terminal when it queries the host
---     for pixel size (libvterm doesn't answer), leaving one frame.
---   * kitty's icat graphics don't survive nvim's embedded terminal.
---
--- So we drive it ourselves: pre-render every frame to a fixed-size block of
--- chafa "symbols" text (cached to disk), then cycle the frames on a timer by
--- writing them to a terminal channel with cursor-home. Static images take the
--- same path with a single draw.
+-- The animated path avoids chafa's own animation (which scrolls inside nvim's
+-- terminal or stalls on its pixel-size query) and snacks' caching terminal
+-- section (which freezes a live process). We drive frames ourselves.
 local M = {}
+
+local theme_media = require("config.theme_media")
 
 local WIDTH, HEIGHT = 32, 16 -- float / render size in cells (fits below the logo)
 local FPS = 14
-local GIF_PATH = vim.fn.stdpath("config") .. "/images/giphy.gif"
-local IMG_BOLSONARO = vim.fn.stdpath("config") .. "/images/capitao.jpg"
-local FRAMES_FILE = vim.fn.stdpath("cache") .. "/chadvim_gif_frames.txt"
+local SENTINEL = "\12\n"     -- form-feed between cached frames
 
--- Reads ~/.config/nvim/colorscheme.lua (managed by the dotfiles theme switcher)
-local function active_theme()
-  local ok, cs = pcall(dofile, vim.fn.stdpath("config") .. "/colorscheme.lua")
-  return ok and cs or ""
+-- Per-media cache file (so each theme's gif gets its own cache).
+local function frames_file(media)
+  local key = vim.fn.sha256(media .. ":" .. WIDTH .. "x" .. HEIGHT)
+  return vim.fn.stdpath("cache") .. "/chadvim_frames_" .. key .. ".txt"
 end
 
--- Frames are cached as clean per-frame chafa blocks separated by a form-feed
--- sentinel (0x0c). Each block is the same fixed size, so cycling them never
--- drifts (the old "scrolling" bug came from splitting chafa's animated stream
--- by a guessed line count).
-local SENTINEL = "\12\n"
-
-local function load_frames()
-  local fd = io.open(FRAMES_FILE, "rb")
+local function load_frames(media)
+  local fd = io.open(frames_file(media), "rb")
   if not fd then return nil end
   local data = fd:read("*a")
   fd:close()
@@ -54,11 +40,12 @@ end
 
 -- Extract every GIF frame with ffmpeg, render each to a fixed-size chafa block,
 -- join with the sentinel. Async so it never blocks startup.
-local function generate(cb)
+local function generate(media, cb)
   if vim.fn.executable("chafa") ~= 1 or vim.fn.executable("ffmpeg") ~= 1 then return end
-  if not vim.uv.fs_stat(GIF_PATH) then return end
-  local tmp = vim.fn.stdpath("cache") .. "/chadvim_frames_png"
-  local gif, out, dir = vim.fn.shellescape(GIF_PATH), vim.fn.shellescape(FRAMES_FILE), vim.fn.shellescape(tmp)
+  if not vim.uv.fs_stat(media) then return end
+  local tmp = vim.fn.tempname() .. "_chadvim_frames" -- unique dir, no concurrent clash
+  local out = vim.fn.shellescape(frames_file(media))
+  local gif, dir = vim.fn.shellescape(media), vim.fn.shellescape(tmp)
   local script = table.concat({
     "set -e",
     "rm -rf " .. dir .. " && mkdir -p " .. dir,
@@ -86,7 +73,7 @@ end
 
 -- Window row of the gap reserved in snacks below the header: the first run of
 -- >= HEIGHT blank lines that comes *after* the header art. Robust to headers
--- that contain their own blank lines (e.g. bolsonaro) and to top centring padding.
+-- that contain their own blank lines and to top centring padding.
 local function gap_row(dash_buf)
   local lines = vim.api.nvim_buf_get_lines(dash_buf, 0, -1, false)
   local seen_content, run_start, run = false, nil, 0
@@ -95,7 +82,7 @@ local function gap_row(dash_buf)
       if seen_content then
         if run == 0 then run_start = idx end
         run = run + 1
-        if run >= HEIGHT then return run_start - 1 end -- 0-based row
+        if run >= HEIGHT then return run_start - 1 end
       end
     else
       seen_content, run = true, 0
@@ -104,7 +91,7 @@ local function gap_row(dash_buf)
   return run_start and (run_start - 1) or 0
 end
 
--- Build the floating terminal window centred horizontally, just below the logo.
+-- Floating terminal window, centred horizontally, just below the logo.
 local function make_float(dash_buf)
   local dash_win = vim.fn.bufwinid(dash_buf)
   if dash_win == -1 then return false end
@@ -136,10 +123,10 @@ local function make_float(dash_buf)
   return true
 end
 
-local function open_gif(dash_buf)
-  local frames = load_frames()
+local function open_gif(dash_buf, media)
+  local frames = load_frames(media)
   if not frames then
-    generate() -- not ready yet; build cache for next time
+    generate(media) -- not ready yet; build cache for next time
     return
   end
   if not make_float(dash_buf) then return end
@@ -151,27 +138,24 @@ local function open_gif(dash_buf)
       close()
       return
     end
-    -- cursor-home, draw frame, clear anything below: in-place, no scroll.
     pcall(vim.api.nvim_chan_send, chan, "\27[H" .. frames[i] .. "\27[J")
     i = i % #frames + 1
     pcall(vim.api.nvim__redraw, { win = win, valid = false, flush = true })
   end))
 end
 
-local function open_static(dash_buf, img_path)
-  if vim.fn.executable("chafa") ~= 1 or not vim.uv.fs_stat(img_path) then return end
+local function open_static(dash_buf, media)
+  if vim.fn.executable("chafa") ~= 1 or not vim.uv.fs_stat(media) then return end
   if not make_float(dash_buf) then return end
-
   local cmd = string.format(
     "chafa -f symbols --align center,center --view-size %dx%d %s",
-    WIDTH, HEIGHT, vim.fn.shellescape(img_path)
+    WIDTH, HEIGHT, vim.fn.shellescape(media)
   )
   vim.system({ "sh", "-c", cmd }, { text = false }, function(res)
     if not (res.stdout and #res.stdout > 0) then return end
     vim.schedule(function()
       if not (win and vim.api.nvim_win_is_valid(win) and chan) then return end
-      -- terminal channel needs CRLF, chafa emits LF only
-      local txt = res.stdout:gsub("\n", "\r\n")
+      local txt = res.stdout:gsub("\n", "\r\n") -- terminal channel needs CRLF
       pcall(vim.api.nvim_chan_send, chan, "\27[H" .. txt .. "\27[J")
       pcall(vim.api.nvim__redraw, { win = win, valid = false, flush = true })
     end)
@@ -180,20 +164,22 @@ end
 
 local function open(dash_buf)
   close()
-  local t = active_theme()
-  if t == "chadarch-berserk" then
-    return -- berserk keeps its own snacks art pane
-  elseif t == "chadarch-bolsonaro" then
-    open_static(dash_buf, IMG_BOLSONARO)
+  local media = theme_media.current().media
+  if not media then return end -- theme opted out of a dashboard overlay
+  if media:lower():match("%.gif$") then
+    open_gif(dash_buf, media)
   else
-    open_gif(dash_buf) -- CHADVIM default
+    open_static(dash_buf, media)
   end
 end
 
 function M.setup()
   local group = vim.api.nvim_create_augroup("ChadvimDashboardGif", { clear = true })
-  -- build the GIF frame cache ahead of time if missing
-  if not vim.uv.fs_stat(FRAMES_FILE) then generate() end
+  -- warm the gif cache for the current theme ahead of time
+  local media = theme_media.current().media
+  if media and media:lower():match("%.gif$") and not vim.uv.fs_stat(frames_file(media)) then
+    generate(media)
+  end
 
   vim.api.nvim_create_autocmd("User", {
     group = group,

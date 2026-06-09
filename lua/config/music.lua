@@ -4,35 +4,24 @@
 -- JSON commands to a unix socket. Music auto-starts when the dashboard opens
 -- (fresh nvim, no file args) and is controllable with <leader>m.
 --
--- Tracks live in ~/.config/nvim/songs. On a CHADVIM theme it plays the
--- songs/gigaMusic subfolder (e.g. gigamusic.mp3); otherwise the whole songs dir.
+-- Which folder/file plays per theme is configured in lua/config/theme_media.lua.
 local M = {}
 
-local SONGS_DIR = vim.fn.stdpath("config") .. "/songs"
+local theme_media = require("config.theme_media")
+
 local SOCKET = vim.fn.stdpath("cache") .. "/nvim-mpv.sock"
 local DEFAULT_VOLUME = 50
 local EXTS = { "mp3", "flac", "ogg", "opus", "m4a", "wav" }
 
 local job ---@type integer?
 
--- Reads ~/.config/nvim/colorscheme.lua (managed by the dotfiles theme switcher)
-local function active_theme()
-  local ok, cs = pcall(dofile, vim.fn.stdpath("config") .. "/colorscheme.lua")
-  return ok and cs or ""
-end
-
--- Folder mpv plays, picked by the active theme.
-local function music_dir()
-  local t = active_theme()
-  if t == "chadarch-bolsonaro" then return SONGS_DIR .. "/bolsonaro" end
-  if t ~= "chadarch-berserk" then return SONGS_DIR .. "/gigaMusic" end -- CHADVIM default
-  return SONGS_DIR
-end
-
-local function has_tracks(dir)
-  if vim.fn.isdirectory(dir) == 0 then return false end
+-- A path has tracks if it's an audio file, or a folder containing audio.
+local function has_tracks(path)
+  if not path then return false end
+  if vim.fn.filereadable(path) == 1 then return true end
+  if vim.fn.isdirectory(path) == 0 then return false end
   for _, ext in ipairs(EXTS) do
-    if #vim.fn.globpath(dir, "**/*." .. ext, false, true) > 0 then return true end
+    if #vim.fn.globpath(path, "**/*." .. ext, false, true) > 0 then return true end
   end
   return false
 end
@@ -61,9 +50,9 @@ function M.start()
     vim.notify("mpv not installed: sudo apt install mpv", vim.log.levels.WARN)
     return
   end
-  local dir = music_dir()
-  if not has_tracks(dir) then
-    vim.notify("No audio in " .. dir .. " — drop some tracks there", vim.log.levels.INFO)
+  local path = theme_media.current().music
+  if not has_tracks(path) then
+    vim.notify("No audio for this theme (" .. tostring(path) .. ")", vim.log.levels.INFO)
     return
   end
   job = vim.fn.jobstart({
@@ -75,7 +64,7 @@ function M.start()
     "--shuffle",
     "--volume=" .. DEFAULT_VOLUME,
     "--input-ipc-server=" .. SOCKET,
-    dir,
+    path,
   })
 end
 
