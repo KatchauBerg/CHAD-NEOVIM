@@ -64,6 +64,11 @@ return {
   -- cond = not vim.g.vscode,
   priority = 1000,
   lazy = false,
+  config = function(_, opts)
+    require("snacks").setup(opts)
+    require("config.dashboard_gif").setup()
+    require("config.music").setup()
+  end,
   opts = {
     bigfile = { enabled = false },
     dashboard = { enabled = true,
