@@ -65,6 +65,8 @@ return {
     opts = {
       defaults = {
         ["<leader>r"] = { name = "+relative numbers" },
+        ["<leader>o"] = { name = "+obsidian" },
+        ["<leader>m"] = { name = "+music" },
       },
     },
     keys = {

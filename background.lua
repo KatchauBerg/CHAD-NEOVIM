@@ -1,1 +1,1 @@
-return "blur"
+return "transparent"
