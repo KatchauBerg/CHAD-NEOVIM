@@ -15,6 +15,7 @@ Repositório: `https://github.com/KatchauBerg/CHAD-NEOVIM.git`
 | **Node.js + npm** | LSPs JS/TS e ferramentas | sim |
 | **ripgrep** | grep do snacks/telescope | sim |
 | **fzf** | busca fuzzy | recomendado |
+| **lazygit** | UI de git (`<leader>gg`) | recomendado |
 | **Nerd Font** | ícones (ex. FiraCode Nerd Font) | sim |
 | **chafa** | imagem/GIF no dashboard | opcional |
 | **ffmpeg** | extrair frames do GIF do dashboard | opcional |
@@ -38,12 +39,12 @@ sudo add-apt-repository ppa:neovim-ppa/unstable -y && sudo apt update && sudo ap
 
 **Arch / Manjaro:**
 ```bash
-sudo pacman -Syu neovim git base-devel ripgrep fzf chafa ffmpeg mpv nodejs npm
+sudo pacman -Syu neovim git base-devel ripgrep fzf chafa ffmpeg mpv nodejs npm lazygit
 ```
 
 **Fedora:**
 ```bash
-sudo dnf install -y neovim git gcc gcc-c++ ripgrep fzf chafa ffmpeg mpv nodejs npm
+sudo dnf install -y neovim git gcc gcc-c++ ripgrep fzf chafa ffmpeg mpv nodejs npm lazygit
 ```
 
 ### 1.2. Clonar a config
@@ -69,7 +70,7 @@ Usa [Homebrew](https://brew.sh/). Instale-o se não tiver:
 
 ### 2.1. Dependências
 ```bash
-brew install neovim git ripgrep fzf chafa ffmpeg mpv node
+brew install neovim git ripgrep fzf chafa ffmpeg mpv node lazygit
 xcode-select --install                       # compilador C (clang)
 brew install --cask font-fira-code-nerd-font # Nerd Font
 ```
@@ -101,7 +102,7 @@ irm get.scoop.sh | iex
 winget install Neovim.Neovim Git.Git OpenJS.NodeJS
 
 # CLI tools
-scoop install ripgrep fzf chafa ffmpeg mpv
+scoop install ripgrep fzf chafa ffmpeg mpv lazygit
 
 # Compilador C: Build Tools for Visual Studio
 #   https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022
