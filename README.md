@@ -38,7 +38,7 @@ Imagem e música por tema configuram-se num só lugar: `lua/config/theme_media.l
 | **Neovim 0.9+** | o editor | sim |
 | **Git** | clonar config + plugins | sim |
 | **Compilador C** (`gcc`/`clang`/MSVC) | compilar parsers do treesitter | sim |
-| **Node.js + npm** | `coc.nvim` e LSPs | sim |
+| **Node.js + npm** | LSPs JS/TS e ferramentas | sim |
 | **ripgrep** | grep do snacks/telescope | sim |
 | **fzf** | busca fuzzy | recomendado |
 | **Nerd Font** | ícones (ex. FiraCode Nerd Font) | sim |
@@ -157,12 +157,99 @@ nvim
    ```
    :checkhealth
    ```
-3. **Extensões do coc.nvim:**
+3. **Instalar servidores LSP** (via mason):
    ```
-   :CocInstall coc-tsserver coc-pyright coc-json
+   :Mason
    ```
+   Selecione os servidores que quiser (ex. `lua-language-server`, `pyright`, `typescript-language-server`).
 
 Reinicie o Neovim. Pronto.
+
+---
+
+## Plugins
+
+Gerenciados por [lazy.nvim](https://github.com/folke/lazy.nvim) (auto-instalado no primeiro boot).
+
+### Interface
+| Plugin | Função |
+|--------|--------|
+| [folke/snacks.nvim](https://github.com/folke/snacks.nvim) | dashboard, picker, explorer, notifier, terminal, zen… |
+| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) | statusline |
+| [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim) | abas/buffers no topo |
+| [nvim-tree/nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua) | árvore de arquivos |
+| [nvim-tree/nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) | ícones (Nerd Font) |
+| [rcarriga/nvim-notify](https://github.com/rcarriga/nvim-notify) | notificações |
+| [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim) | guias de indentação |
+| [HiPhish/rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim) | parênteses coloridos |
+| [sphamba/smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim) | rastro animado do cursor |
+| [3rd/image.nvim](https://github.com/3rd/image.nvim) | imagens no buffer (usa `magick`) |
+
+### Temas
+| Plugin | Função |
+|--------|--------|
+| `chadarch-themes` (local, `nvim-themes/`) | gigachad, berserk, bolsonaro, hacking, kuromi |
+| [catppuccin/nvim](https://github.com/catppuccin/nvim) | tema catppuccin |
+| [ellisonleao/gruvbox.nvim](https://github.com/ellisonleao/gruvbox.nvim) | tema gruvbox |
+| [rebelot/kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim) | tema kanagawa |
+| [EdenEast/nightfox.nvim](https://github.com/EdenEast/nightfox.nvim) | tema nightfox |
+| [audibleblink/hackthebox.vim](https://github.com/audibleblink/hackthebox.vim) | tema hackthebox |
+
+### LSP, completação e snippets
+| Plugin | Função |
+|--------|--------|
+| [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) | configuração de servidores LSP |
+| [williamboman/mason.nvim](https://github.com/williamboman/mason.nvim) | instalador de LSP/DAP/linters |
+| [williamboman/mason-lspconfig.nvim](https://github.com/williamboman/mason-lspconfig.nvim) | ponte mason ↔ lspconfig |
+| [hrsh7th/nvim-cmp](https://github.com/hrsh7th/nvim-cmp) | engine de autocompletar |
+| [hrsh7th/cmp-nvim-lsp](https://github.com/hrsh7th/cmp-nvim-lsp) | fonte: LSP |
+| [hrsh7th/cmp-buffer](https://github.com/hrsh7th/cmp-buffer) | fonte: buffer |
+| [hrsh7th/cmp-path](https://github.com/hrsh7th/cmp-path) | fonte: caminhos |
+| [L3MON4D3/LuaSnip](https://github.com/L3MON4D3/LuaSnip) | engine de snippets |
+| [saadparwaiz1/cmp_luasnip](https://github.com/saadparwaiz1/cmp_luasnip) | ponte LuaSnip ↔ cmp |
+| [rafamadriz/friendly-snippets](https://github.com/rafamadriz/friendly-snippets) | coleção de snippets |
+| [folke/lazydev.nvim](https://github.com/folke/lazydev.nvim) | LSP Lua afinado pro Neovim |
+| [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim) | formatação de código |
+
+### Treesitter e edição
+| Plugin | Função |
+|--------|--------|
+| [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | parsing/highlight |
+| [andymass/vim-matchup](https://github.com/andymass/vim-matchup) | navegação entre pares |
+| [kylechui/nvim-surround](https://github.com/kylechui/nvim-surround) | manipular aspas/parênteses |
+| [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs) | fechamento automático de pares |
+| [smoka7/multicursors.nvim](https://github.com/smoka7/multicursors.nvim) | múltiplos cursores |
+| [nvimtools/hydra.nvim](https://github.com/nvimtools/hydra.nvim) | submenus de teclas (dep. multicursors) |
+
+### Git
+| Plugin | Função |
+|--------|--------|
+| [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | sinais de git na gutter, hunks, blame |
+
+### Debug (DAP)
+| Plugin | Função |
+|--------|--------|
+| [mfussenegger/nvim-dap](https://github.com/mfussenegger/nvim-dap) | cliente de debug |
+| [rcarriga/nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) | UI do debugger |
+| [theHamsta/nvim-dap-virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text) | valores inline |
+| [jay-babu/mason-nvim-dap.nvim](https://github.com/jay-babu/mason-nvim-dap.nvim) | instala adaptadores via mason |
+| [nvim-neotest/nvim-nio](https://github.com/nvim-neotest/nvim-nio) | lib async (dep. dap-ui) |
+
+### Notas e produtividade
+| Plugin | Função |
+|--------|--------|
+| [obsidian-nvim/obsidian.nvim](https://github.com/obsidian-nvim/obsidian.nvim) | cofres Obsidian dentro do Neovim |
+| [epwalsh/pomo.nvim](https://github.com/epwalsh/pomo.nvim) | timer pomodoro |
+| [thePrimeagen/vim-be-good](https://github.com/ThePrimeagen/vim-be-good) | jogo pra treinar movimentos do vim |
+| [folke/which-key.nvim](https://github.com/folke/which-key.nvim) | dica de atalhos ao pressionar `<leader>` |
+
+### Bibliotecas (dependências)
+| Plugin | Função |
+|--------|--------|
+| [nvim-lua/plenary.nvim](https://github.com/nvim-lua/plenary.nvim) | utilitários Lua (dep. de vários) |
+| [leafo/magick](https://github.com/leafo/magick) | binding ImageMagick (dep. image.nvim) |
+
+> Completação/LSP usa **mason + nvim-cmp + lspconfig** (não coc.nvim).
 
 ---
 
