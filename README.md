@@ -41,6 +41,7 @@ Imagem e música por tema configuram-se num só lugar: `lua/config/theme_media.l
 | **Node.js + npm** | LSPs JS/TS e ferramentas | sim |
 | **ripgrep** | grep do snacks/telescope | sim |
 | **fzf** | busca fuzzy | recomendado |
+| **lazygit** | UI de git (`<leader>gg`) | recomendado |
 | **Nerd Font** | ícones (ex. FiraCode Nerd Font) | sim |
 | **chafa** | imagem/GIF no dashboard | opcional |
 | **ffmpeg** | extrair frames do GIF do dashboard | opcional |
@@ -62,16 +63,20 @@ sudo apt update
 sudo apt install -y git curl build-essential ripgrep fzf chafa ffmpeg mpv nodejs npm
 # Neovim recente (o do apt costuma ser antigo):
 sudo add-apt-repository ppa:neovim-ppa/unstable -y && sudo apt update && sudo apt install -y neovim
+# lazygit (não está no apt padrão — instala o binário mais recente):
+LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": *"v\K[^"]*')
+curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+tar xf /tmp/lazygit.tar.gz -C /tmp lazygit && sudo install /tmp/lazygit /usr/local/bin
 ```
 
 **Arch / Manjaro:**
 ```bash
-sudo pacman -Syu neovim git base-devel ripgrep fzf chafa ffmpeg mpv nodejs npm
+sudo pacman -Syu neovim git base-devel ripgrep fzf chafa ffmpeg mpv nodejs npm lazygit
 ```
 
 **Fedora:**
 ```bash
-sudo dnf install -y neovim git gcc gcc-c++ ripgrep fzf chafa ffmpeg mpv nodejs npm
+sudo dnf install -y neovim git gcc gcc-c++ ripgrep fzf chafa ffmpeg mpv nodejs npm lazygit
 ```
 
 ### Instalar a config
@@ -95,7 +100,7 @@ Usa [Homebrew](https://brew.sh/). Instale-o primeiro se não tiver:
 
 ### Dependências
 ```bash
-brew install neovim git ripgrep fzf chafa ffmpeg mpv node
+brew install neovim git ripgrep fzf chafa ffmpeg mpv node lazygit
 xcode-select --install   # compilador C (clang)
 ```
 Nerd Font via brew:
@@ -127,7 +132,7 @@ irm get.scoop.sh | iex
 winget install Neovim.Neovim Git.Git OpenJS.NodeJS
 
 # CLI tools via Scoop
-scoop install ripgrep fzf chafa ffmpeg mpv
+scoop install ripgrep fzf chafa ffmpeg mpv lazygit
 
 # Compilador C: Build Tools for Visual Studio
 #   https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022
