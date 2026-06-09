@@ -1,1 +1,1 @@
-return "transparent"
+return "solid"

@@ -68,6 +68,7 @@ return {
     require("snacks").setup(opts)
     require("config.dashboard_gif").setup()
     require("config.music").setup()
+    require("config.jokes").setup()
   end,
   opts = {
     bigfile = { enabled = false },

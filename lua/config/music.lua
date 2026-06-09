@@ -46,6 +46,7 @@ end
 
 function M.start()
   if running() then return end
+  if not require("config.jokes").enabled() then return end -- jokes off: stay silent
   if vim.fn.executable("mpv") ~= 1 then
     vim.notify("mpv not installed: sudo apt install mpv", vim.log.levels.WARN)
     return
