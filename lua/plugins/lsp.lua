@@ -12,10 +12,10 @@ return {
     config = function()
       require("mason").setup()
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "pylsp", "ts_ls", "clangd", "html", "cssls", "eslint" },
+        ensure_installed = { "lua_ls", "pylsp", "ts_ls", "clangd", "html", "cssls", "eslint", "intelephense", "asm_lsp" },
       })
       require("mason-nvim-dap").setup({
-        ensure_installed = { "codelldb" },
+        ensure_installed = { "codelldb", "js-debug-adapter" },
         automatic_installation = true,
       })
     end,
@@ -53,7 +53,7 @@ return {
       )
 
       vim.lsp.config("*", { capabilities = capabilities })
-      vim.lsp.enable({ "html", "cssls", "lua_ls", "pylsp", "ts_ls", "clangd", "eslint" })
+      vim.lsp.enable({ "html", "cssls", "lua_ls", "pylsp", "ts_ls", "clangd", "eslint", "intelephense", "asm_lsp" })
     end,
   },
 }

@@ -72,6 +72,7 @@ return {
         scss = { "prettier" },
         markdown = { "prettier" },
         graphql = { "prettier" },
+        php = { "php_cs_fixer" },
       },
       format_on_save = {
         timeout_ms = 1000,

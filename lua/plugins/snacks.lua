@@ -12,6 +12,24 @@ local function is_bolsonaro()
   return active_theme() == "chadarch-bolsonaro"
 end
 
+local function is_chadphp()
+  return active_theme() == "chadarch-chadphp"
+end
+
+local CHADPHP_HEADER = table.concat({
+  "",
+  "  ██████ ██   ██  █████  ██████  ██████  ██   ██ ██████  ",
+  " ██      ██   ██ ██   ██ ██   ██ ██   ██ ██   ██ ██   ██ ",
+  " ██      ███████ ███████ ██   ██ ██████  ███████ ██████  ",
+  " ██      ██   ██ ██   ██ ██   ██ ██      ██   ██ ██      ",
+  "  ██████ ██   ██ ██   ██ ██████  ██      ██   ██ ██      ",
+  "",
+  "  ────────────────────────────────────────────────────────",
+  "        PHP: Hypertext Preprocessor — built different",
+  "  ────────────────────────────────────────────────────────",
+  "",
+}, "\n")
+
 local BOLSONARO_HEADER = table.concat({
   "",
   "  ██████   ██████  ██      ███████  ██████  ██    ██ ██ ███    ███ ",
@@ -58,6 +76,7 @@ local CHADARCH_HEADER = table.concat({
 
 local berserk    = is_berserk()
 local bolsonaro  = is_bolsonaro()
+local chadphp    = is_chadphp()
 
 return {
   "folke/snacks.nvim",
@@ -74,7 +93,7 @@ return {
     bigfile = { enabled = false },
     dashboard = { enabled = true,
       preset = {
-        header = berserk and BERSERK_HEADER or bolsonaro and BOLSONARO_HEADER or CHADARCH_HEADER,
+        header = berserk and BERSERK_HEADER or bolsonaro and BOLSONARO_HEADER or chadphp and CHADPHP_HEADER or CHADARCH_HEADER,
       },
       sections = {
         {

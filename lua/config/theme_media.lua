@@ -18,6 +18,7 @@ local CONFIG = vim.fn.stdpath "config"
 M.themes = {
   ["chadarch-bolsonaro"] = { media = "images/capitao.jpg", music = "songs/bolsonaro" },
   ["chadarch-berserk"] = { media = "images/berserk.jpg", music = "songs/berserk" },
+  ["chadarch-china"] = { media = "images/mao-tse.jpeg", music = "songs/china" },
 }
 
 -- Used when the active theme has no entry above (the CHADVIM default look).

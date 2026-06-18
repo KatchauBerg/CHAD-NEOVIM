@@ -9,6 +9,7 @@ return {
         "lua", "vim", "vimdoc", "html", "css",
         "typescript", "javascript", "python", "json",
         "markdown", "tsx", "c", "cpp",
+        "php", "phpdoc", "asm",
       },
       highlight = { enable = true },
       indent = { enable = true },
