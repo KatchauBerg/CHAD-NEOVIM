@@ -109,6 +109,7 @@ return {
     require("config.dashboard_gif").setup()
     require("config.music").setup()
     require("config.jokes").setup()
+    require("config.ytmusic").setup()
 
     -- CATVIM RGB wave: animate header glyphs while Catppuccin is active.
     -- Hook snacks' own post-render events (the dashboard re-renders via

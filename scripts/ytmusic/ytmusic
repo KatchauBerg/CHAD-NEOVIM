@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Launcher for the YouTube Music terminal player.
+#
+# Keeps the Python deps (ytmusicapi) in a private venv outside the nvim repo so
+# nothing leaks into the system Python or gets committed. On first run it builds
+# the venv and installs requirements; if auth isn't set up yet it prints the
+# one-time setup steps and exits.
+set -euo pipefail
+
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"  # resolve symlink (e.g. ~/.local/bin/ytmusic)
+SCRIPT_DIR="$(cd "$(dirname "$SELF")" && pwd)"
+
+VENV_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/ytmusic-tui/venv"
+AUTH_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ytmusic-tui"
+AUTH_FILE="$AUTH_DIR/browser_auth.json"
+
+PY="$VENV_DIR/bin/python"
+
+# 1. Build the venv + install deps on first run.
+if [[ ! -x "$PY" ]]; then
+  echo "ytmusic: criando venv em $VENV_DIR ..." >&2
+  if ! python3 -m venv "$VENV_DIR" >/tmp/ytmusic-venv-err 2>&1; then
+    rm -rf "$VENV_DIR"
+    cat >&2 <<EOF
+ytmusic: falha ao criar a venv. Falta o pacote python3-venv (ensurepip).
+
+Instale (1x, precisa sudo):
+    sudo apt install python3-venv python3-pip
+
+Detalhe:
+$(cat /tmp/ytmusic-venv-err)
+
+Depois rode 'ytmusic' de novo.
+EOF
+    rm -f /tmp/ytmusic-venv-err
+    exit 1
+  fi
+  "$VENV_DIR/bin/python" -m pip install --quiet --upgrade pip
+fi
+
+# Install/repair deps if ytmusicapi is missing (covers a half-built venv).
+if ! "$PY" -c "import ytmusicapi" 2>/dev/null; then
+  echo "ytmusic: instalando dependências ..." >&2
+  "$VENV_DIR/bin/python" -m pip install --quiet -r "$SCRIPT_DIR/requirements.txt"
+  echo "ytmusic: deps prontas." >&2
+fi
+
+# 2. Auth é opcional: sem ela funciona busca pública (search-only). Com ela,
+#    libera "Minhas playlists"/"Curtidas" e qualidade Premium. Só avisa.
+if [[ ! -f "$AUTH_FILE" ]]; then
+  cat >&2 <<EOF
+ytmusic: rodando sem login (só busca pública). Pra biblioteca pessoal + Premium:
+  1. Logue no YouTube Music no Firefox (https://music.youtube.com).
+  2. mkdir -p "$AUTH_DIR" && cd "$AUTH_DIR" && "$VENV_DIR/bin/ytmusicapi" browser
+  3. Cole os headers de uma request POST autenticada (devtools > Rede).
+  4. Salve o resultado em: $AUTH_FILE
+EOF
+fi
+
+# 3. Run the player.
+exec "$PY" "$SCRIPT_DIR/ytmusic.py" "$@"
