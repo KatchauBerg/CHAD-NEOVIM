@@ -10,6 +10,7 @@ Auth: needs a ytmusicapi browser-auth file (see the launcher's setup notes).
 """
 import json
 import os
+import shutil
 import socket
 import subprocess
 import sys
@@ -239,8 +240,13 @@ def _connectable():
 
 
 def start_daemon():
-    """Spawn a detached, headless, idle mpv with the IPC socket. Survives the
-    launching terminal/nvim (new session, no controlling tty)."""
+    """Spawn a detached, headless, idle mpv with the IPC socket.
+
+    Launched in its own systemd user scope when available: terminals like kitty
+    run under a per-window cgroup scope that Wayland compositors *freeze* on
+    minimize, which would freeze a child mpv too (music pauses until refocus).
+    A transient unit lives in app.slice, outside that scope, so it keeps playing.
+    Falls back to a plain detached process when systemd-run isn't available."""
     YTM_SOCKET.parent.mkdir(parents=True, exist_ok=True)
     # yt-dlp raw options through mpv's ytdl_hook. mpv splits this list on commas,
     # so every value must be comma-free (tv_embedded is a single client on purpose).
@@ -262,14 +268,24 @@ def start_daemon():
         "--ytdl-format=bestaudio/best",
         "--ytdl-raw-options=" + ",".join(raw),
     ]
-    devnull = subprocess.DEVNULL
-    subprocess.Popen(
-        cmd,
-        stdin=devnull,
-        stdout=devnull,
-        stderr=devnull,
-        start_new_session=True,  # detach: own process group, no parent kill
-    )
+    spawned = False
+    if shutil.which("systemd-run"):
+        unit = f"ytmusic-mpv-{os.getpid()}"
+        rc = subprocess.run(
+            ["systemd-run", "--user", "--quiet", "--collect", f"--unit={unit}", "--", *cmd],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        ).returncode
+        spawned = rc == 0
+    if not spawned:
+        devnull = subprocess.DEVNULL
+        subprocess.Popen(
+            cmd,
+            stdin=devnull,
+            stdout=devnull,
+            stderr=devnull,
+            start_new_session=True,  # detach: own process group, no parent kill
+        )
     # Wait for the IPC socket to come up.
     for _ in range(50):
         if YTM_SOCKET.exists() and _connectable():

@@ -72,6 +72,12 @@ O playback roda num **daemon mpv destacado** (headless) com socket IPC próprio
 terminal ou sai do Neovim — igual à joke music, mas sem morrer junto da sessão.
 O picker só enfileira as faixas no daemon e sai.
 
+Quando há `systemd --user`, o daemon sobe num **scope systemd próprio**
+(`app.slice`), fora do cgroup do terminal. Sem isso, terminais como o kitty rodam
+num cgroup que o compositor Wayland **congela ao minimizar** — o que pausaria o
+mpv junto (música parava até focar a janela de novo). No scope próprio ele não
+congela. Fallback pra processo destacado comum quando não há systemd-run.
+
 Controle (de qualquer terminal):
 
 ```sh
