@@ -39,7 +39,8 @@ autocmd('ColorScheme', {
       local L = require('config.lualine_opts')
       if theme:match('^catppuccin') then
         lualine.setup(L.opts(L.catppuccin_theme()))
-      else
+      elseif not theme:match('^chadarch') then
+        -- chadarch-* statuslines are owned by chad-line.nvim; leave them alone.
         package.loaded['config.matugen_lualine'] = nil
         lualine.setup(L.opts(require('config.matugen_lualine')))
       end
