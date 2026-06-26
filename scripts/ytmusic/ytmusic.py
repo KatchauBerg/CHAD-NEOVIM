@@ -86,13 +86,37 @@ def song_line(item):
     return f"{item.get('title', '?')} — {artists_str(item)}\t{vid}"
 
 
+def search_lives(query, n=25):
+    """Search regular YouTube and keep only ongoing live streams.
+
+    Lives aren't in the YT Music catalog, so this goes through yt-dlp's flat
+    search and filters by live_status (avoids resolving every result).
+    """
+    res = subprocess.run(
+        [
+            "yt-dlp", "-q", "--no-warnings", "--flat-playlist",
+            "--print", "%(live_status)s\t%(id)s\t%(title)s",
+            f"ytsearch{n}:{query}",
+        ],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
+    items = []
+    for line in res.stdout.splitlines():
+        parts = line.split("\t", 2)
+        if len(parts) == 3 and parts[0] == "is_live":
+            items.append((parts[1], parts[2]))  # (id, title)
+    return items
+
+
 def pick_video_ids(yt, authed):
-    """Top menu -> returns a list of videoIds to play (or exits).
+    """Top menu -> returns (video_ids, is_live) to play (or exits).
 
     `authed`: library options (Minhas playlists / Curtidas) only show when
-    logged in; search works unauthenticated too.
+    logged in; search and lives work unauthenticated too.
     """
-    menu = ["Buscar músicas", "Buscar playlists"]
+    menu = ["Buscar músicas", "Buscar playlists", "Lives"]
     if authed:
         menu += ["Minhas playlists", "Curtidas"]
     choice = fzf(menu, prompt="YouTube Music > ")
@@ -107,7 +131,7 @@ def pick_video_ids(yt, authed):
         results = yt.search(query, filter="songs")
         lines = [l for l in (song_line(r) for r in results) if l]
         picked = fzf(lines, multi=True, prompt="músicas > ")
-        return [p.split("\t", 1)[1] for p in picked]
+        return [p.split("\t", 1)[1] for p in picked], False
 
     if choice == "Buscar playlists":
         query = input("Buscar playlist: ").strip()
@@ -122,7 +146,20 @@ def pick_video_ids(yt, authed):
         picked = fzf(lines, prompt="playlist > ")
         if not picked:
             sys.exit(0)
-        return tracks_of_playlist(yt, picked[0].split("\t", 1)[1])
+        return tracks_of_playlist(yt, picked[0].split("\t", 1)[1]), False
+
+    if choice == "Lives":
+        query = input("Buscar live (ex: lofi girl): ").strip()
+        if not query:
+            sys.exit(0)
+        items = search_lives(query)
+        if not items:
+            die("nenhuma live ao vivo encontrada")
+        lines = [f"🔴 {title}\t{vid}" for vid, title in items]
+        picked = fzf(lines, prompt="lives > ")
+        if not picked:
+            sys.exit(0)
+        return [picked[0].split("\t", 1)[1]], True
 
     if choice == "Minhas playlists":
         results = yt.get_library_playlists(limit=200)
@@ -134,13 +171,13 @@ def pick_video_ids(yt, authed):
         picked = fzf(lines, prompt="minhas playlists > ")
         if not picked:
             sys.exit(0)
-        return tracks_of_playlist(yt, picked[0].split("\t", 1)[1])
+        return tracks_of_playlist(yt, picked[0].split("\t", 1)[1]), False
 
     if choice == "Curtidas":
         tracks = yt.get_liked_songs(limit=500).get("tracks", [])
         lines = [l for l in (song_line(t) for t in tracks) if l]
         picked = fzf(lines, multi=True, prompt="curtidas > ")
-        return [p.split("\t", 1)[1] for p in picked]
+        return [p.split("\t", 1)[1] for p in picked], False
 
     sys.exit(0)
 
@@ -240,13 +277,23 @@ def start_daemon():
         time.sleep(0.1)
 
 
-def play(video_ids):
-    """Load the selection into the background daemon, replacing its queue."""
+def play(video_ids, live=False):
+    """Load the selection into the background daemon, replacing its queue.
+
+    `live`: lives need YouTube's default client, but the daemon globally forces
+    tv_embedded (required for normal tracks). So per-file we clear ytdl-raw-options
+    for live entries — mpv's loadfile applies these options only to that entry.
+    """
     if not (YTM_SOCKET.exists() and _connectable()):
         start_daemon()
     urls = [WATCH_URL.format(v) for v in video_ids]
     for i, url in enumerate(urls):
-        ytm_ipc(["loadfile", url, "replace" if i == 0 else "append"])
+        mode = "replace" if i == 0 else "append"
+        if live:
+            # 4th/5th loadfile args: index (-1 = default), per-entry options.
+            ytm_ipc(["loadfile", url, mode, -1, "ytdl-raw-options="])
+        else:
+            ytm_ipc(["loadfile", url, mode])
     ytm_ipc(["set_property", "pause", False])
 
 
@@ -317,12 +364,12 @@ def pick_and_play():
     auth = load_auth()
     yt = YTMusic(auth) if auth else YTMusic()
 
-    video_ids = pick_video_ids(yt, authed=auth is not None)
+    video_ids, live = pick_video_ids(yt, authed=auth is not None)
     if not video_ids:
         die("nada selecionado")
 
     stop_joke_music()       # don't overlap the dashboard background music
-    play(video_ids)         # detached daemon: keeps playing after we exit
+    play(video_ids, live=live)  # detached daemon: keeps playing after we exit
 
 
 def main():

@@ -14,21 +14,29 @@ local function script()
   return vim.fn.stdpath("config") .. "/scripts/ytmusic/ytmusic"
 end
 
--- Fire-and-forget JSON command to the background daemon (no-op if not running).
-local function ipc(command)
+-- Send a JSON command to the background daemon (no-op if not running).
+-- `sync` pumps the event loop until the write flushes — required at exit, where
+-- a fire-and-forget write would be dropped during nvim's teardown.
+local function ipc(command, sync)
   if vim.uv.fs_stat(SOCKET) == nil then
-    vim.notify("YouTube Music não está tocando", vim.log.levels.INFO)
+    if not sync then vim.notify("YouTube Music não está tocando", vim.log.levels.INFO) end
     return
   end
+  local done = false
   local pipe = vim.uv.new_pipe(false)
   pipe:connect(SOCKET, function(err)
     if err then
       pipe:close()
+      done = true
       return
     end
     pipe:write(vim.json.encode({ command = command }) .. "\n")
-    pipe:shutdown(function() pipe:close() end)
+    pipe:shutdown(function()
+      pipe:close()
+      done = true
+    end)
   end)
+  if sync then vim.wait(1000, function() return done end) end
 end
 
 -- True once this nvim session opened the picker. Used to decide whether to stop
@@ -46,7 +54,7 @@ function M.next() ipc({ "playlist-next" }) end
 function M.prev() ipc({ "playlist-prev" }) end
 function M.vol(delta) ipc({ "add", "volume", delta }) end
 function M.stop()
-  ipc({ "quit" })
+  ipc({ "quit" }, true)  -- sync: make sure quit lands even during nvim exit
   pcall(vim.uv.fs_unlink, SOCKET)
 end
 
@@ -71,11 +79,7 @@ function M.setup()
   vim.api.nvim_create_autocmd("VimLeavePre", {
     group = vim.api.nvim_create_augroup("ChadvimYTMusic", { clear = true }),
     callback = function()
-      -- Synchronous stop: the async socket write in M.stop() may not flush
-      -- before nvim tears down, so run the blocking CLI path and wait.
-      if M._started_here and vim.uv.fs_stat(SOCKET) then
-        pcall(function() vim.system({ script(), "stop" }):wait(2000) end)
-      end
+      if M._started_here then M.stop() end
     end,
   })
 end

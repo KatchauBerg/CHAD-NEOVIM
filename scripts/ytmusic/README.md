@@ -6,6 +6,15 @@ playlists** e curtidas via [`ytmusicapi`](https://ytmusicapi.readthedocs.io) +
 Premium). Ao iniciar, **para a "joke music"** de fundo do dashboard do nvim pra
 não tocar junto.
 
+## Instalação
+
+```sh
+~/.config/nvim/scripts/ytmusic/install.sh
+```
+
+Instala deps de sistema (apt), cria a venv com `ytmusicapi` e faz o symlink
+`ytmusic` em `~/.local/bin`. Idempotente.
+
 ## Dependências
 
 `mpv`, `yt-dlp`, `fzf`, `python3` (todas já presentes). `ytmusicapi` é instalado
@@ -48,8 +57,13 @@ opus ~126kbps sem PO token / login). Cookies ficam **desligados** por padrão
 - Terminal: `ytmusic` (symlink em `~/.local/bin/ytmusic`).
 - Neovim: `<leader>my` ou `:YTMusic` (abre num terminal flutuante do Snacks).
 
-Menu: **Buscar músicas** · **Buscar playlists** · **Minhas playlists** ·
-**Curtidas**. Múltiplas músicas: `Tab` marca no fzf.
+Menu: **Buscar músicas** · **Buscar playlists** · **Lives** · **Minhas
+playlists** · **Curtidas**. Múltiplas músicas: `Tab` marca no fzf.
+
+**Lives** (ex: Lofi Girl): busca streams 24/7 ao vivo no YouTube (`is_live`) e
+toca direto. Lives usam o client default do YouTube (não o `tv_embedded` das
+músicas) — o override é aplicado por-faixa, sem mexer no resto. Demora alguns
+segundos pra encher o buffer HLS antes do som começar.
 
 ## Toca em segundo plano
 
