@@ -1,1 +1,1 @@
-return "chadarch-china"
+return "catppuccin-mocha"

@@ -26,10 +26,18 @@ return {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
     opts = function()
-      local matugen_theme = require("config.matugen_lualine")
+      -- Catppuccin active -> its shipped lualine theme; otherwise matugen.
+      local ok, cs = pcall(dofile, vim.fn.stdpath("config") .. "/colorscheme.lua")
+      local theme
+      if ok and type(cs) == "string" and cs:match("^catppuccin") then
+        -- catppuccin ships flavour-specific lualine themes; default flavour = mocha
+        theme = (cs == "catppuccin") and "catppuccin-mocha" or cs
+      else
+        theme = require("config.matugen_lualine")
+      end
       return {
         options = {
-          theme = matugen_theme,
+          theme = theme,
           component_separators = { left = "", right = "" },
           section_separators = { left = "", right = "" },
           globalstatus = true,

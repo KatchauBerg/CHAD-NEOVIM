@@ -16,6 +16,26 @@ local function is_chadphp()
   return active_theme() == "chadarch-chadphp"
 end
 
+local function is_catppuccin()
+  return active_theme():match("^catppuccin") ~= nil
+end
+
+-- CATVIM: shown only under Catppuccin. Title chars get a moving RGB "wave"
+-- driven by lua/config/catppuccin_wave.lua.
+local CATVIM_HEADER = table.concat({
+  "",
+  "  ██████   █████  ███████ ██    ██ ██ ███    ███ ",
+  " ██       ██   ██    ██    ██  ██  ██ ████  ████ ",
+  " ██       ███████    ██     ████   ██ ██ ████ ██ ",
+  " ██       ██   ██    ██      ██    ██ ██  ██  ██ ",
+  "  ██████  ██   ██    ██      ██    ██ ██      ██ ",
+  "",
+  "  ────────────────────────────────────────────────",
+  "        (=^･ω･^=)   nyaa~ built different",
+  "  ────────────────────────────────────────────────",
+  "",
+}, "\n")
+
 local CHADPHP_HEADER = table.concat({
   "",
   "  ██████ ██   ██  █████  ██████  ██████  ██   ██ ██████  ",
@@ -77,6 +97,7 @@ local CHADARCH_HEADER = table.concat({
 local berserk    = is_berserk()
 local bolsonaro  = is_bolsonaro()
 local chadphp    = is_chadphp()
+local catppuccin = is_catppuccin()
 
 return {
   "folke/snacks.nvim",
@@ -88,12 +109,36 @@ return {
     require("config.dashboard_gif").setup()
     require("config.music").setup()
     require("config.jokes").setup()
+
+    -- CATVIM RGB wave: animate header glyphs while Catppuccin is active.
+    -- Hook snacks' own post-render events (the dashboard re-renders via
+    -- nvim_buf_set_lines, which wipes extmarks — so we repaint after each).
+    if catppuccin then
+      local CATVIM_LINES = vim.split(CATVIM_HEADER, "\n", { plain = true })
+      local function repaint()
+        local buf = vim.api.nvim_get_current_buf()
+        if vim.bo[buf].filetype ~= "snacks_dashboard" then
+          for _, b in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.bo[b].filetype == "snacks_dashboard" then buf = b break end
+          end
+        end
+        if vim.bo[buf].filetype == "snacks_dashboard" then
+          vim.schedule(function()
+            require("config.catppuccin_wave").start(buf, CATVIM_LINES)
+          end)
+        end
+      end
+      vim.api.nvim_create_autocmd("User", {
+        pattern = { "SnacksDashboardOpened", "SnacksDashboardUpdatePost" },
+        callback = repaint,
+      })
+    end
   end,
   opts = {
     bigfile = { enabled = false },
     dashboard = { enabled = true,
       preset = {
-        header = berserk and BERSERK_HEADER or bolsonaro and BOLSONARO_HEADER or chadphp and CHADPHP_HEADER or CHADARCH_HEADER,
+        header = catppuccin and CATVIM_HEADER or berserk and BERSERK_HEADER or bolsonaro and BOLSONARO_HEADER or chadphp and CHADPHP_HEADER or CHADARCH_HEADER,
       },
       sections = {
         {

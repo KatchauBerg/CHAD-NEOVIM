@@ -16,7 +16,14 @@ return {
     "folke/snacks.nvim",
     "hrsh7th/nvim-cmp",
   },
+  init = function()
+    -- Obsidian's additional syntax features (concealed links, checkboxes, etc.)
+    -- require conceallevel to be 1 or 2.
+    vim.opt.conceallevel = 2
+  end,
   opts = {
+    -- Use the new `:Obsidian <subcommand>` form instead of legacy `:ObsidianX`.
+    legacy_commands = false,
     workspaces = {
       {
         name = "trabalho",
@@ -35,9 +42,9 @@ return {
     picker = {
       name = "snacks.pick",
     },
-    -- Optional, for completion.
+    -- Optional, for completion. nvim_cmp is now auto-detected, so no need to
+    -- declare the source (declaring it is deprecated in obsidian.nvim 4.0).
     completion = {
-      nvim_cmp = true,
       min_chars = 2,
     },
   },

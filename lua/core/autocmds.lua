@@ -22,6 +22,31 @@ autocmd("CursorHold", {
 local theme_group = augroup('ThemeHandler', { clear = true })
 local matugen_group = augroup('MatugenReload', { clear = true })
 local bg_group = augroup('BackgroundMode', { clear = true })
+local catppuccin_group = augroup('CatppuccinSync', { clear = true })
+
+-- Catppuccin active -> sync kitty terminal colors + swap lualine theme.
+-- Other themes -> reset kitty to kitty.conf, restore matugen lualine.
+autocmd('ColorScheme', {
+  group = catppuccin_group,
+  pattern = '*',
+  callback = function(args)
+    local theme = args.match or ''
+    vim.schedule(function()
+      pcall(function() require('config.kitty_theme').sync(theme) end)
+
+      local ok, lualine = pcall(require, 'lualine')
+      if not ok then return end
+      if theme:match('^catppuccin') then
+        -- use the flavour-specific lualine theme (g.colors_name e.g. catppuccin-mocha)
+        local lt = (vim.g.colors_name or ''):match('^catppuccin') and vim.g.colors_name or 'catppuccin-mocha'
+        lualine.setup({ options = { theme = lt } })
+      else
+        package.loaded['config.matugen_lualine'] = nil
+        lualine.setup({ options = { theme = require('config.matugen_lualine') } })
+      end
+    end)
+  end,
+})
 
 -- Re-apply transparency/blur after any colorscheme change
 autocmd('ColorScheme', {
