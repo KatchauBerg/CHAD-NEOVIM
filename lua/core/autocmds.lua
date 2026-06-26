@@ -36,13 +36,12 @@ autocmd('ColorScheme', {
 
       local ok, lualine = pcall(require, 'lualine')
       if not ok then return end
+      local L = require('config.lualine_opts')
       if theme:match('^catppuccin') then
-        -- use the flavour-specific lualine theme (g.colors_name e.g. catppuccin-mocha)
-        local lt = (vim.g.colors_name or ''):match('^catppuccin') and vim.g.colors_name or 'catppuccin-mocha'
-        lualine.setup({ options = { theme = lt } })
+        lualine.setup(L.opts(L.catppuccin_theme()))
       else
         package.loaded['config.matugen_lualine'] = nil
-        lualine.setup({ options = { theme = require('config.matugen_lualine') } })
+        lualine.setup(L.opts(require('config.matugen_lualine')))
       end
     end)
   end,

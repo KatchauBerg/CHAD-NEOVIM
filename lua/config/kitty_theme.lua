@@ -4,7 +4,12 @@
 -- Requires in kitty.conf: `allow_remote_control yes` + `listen_on unix:/tmp/mykitty`.
 local M = {}
 
-local CONF = vim.fn.expand("~/.config/kitty/catppuccin-mocha.conf")
+-- Resolve the active catppuccin flavour ("auto" -> background) and map to its
+-- kitty theme file: ~/.config/kitty/catppuccin-<flavour>.conf
+local function conf_for_flavour()
+  local theme = require("config.lualine_opts").catppuccin_theme() -- "catppuccin-<flavour>"
+  return vim.fn.expand("~/.config/kitty/" .. theme .. ".conf")
+end
 
 local function socket()
   -- kitty exports KITTY_LISTEN_ON for child processes; fall back to configured.
@@ -21,10 +26,11 @@ local function kitty(args)
   vim.system(cmd, { text = true })
 end
 
--- Apply catppuccin palette to all current + future kitty windows.
+-- Apply the active flavour's catppuccin palette to all current + future windows.
 function M.apply()
-  if vim.fn.filereadable(CONF) == 1 then
-    kitty({ "-a", "-c", CONF })
+  local conf = conf_for_flavour()
+  if vim.fn.filereadable(conf) == 1 then
+    kitty({ "-a", "-c", conf })
   end
 end
 
